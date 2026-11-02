@@ -1,0 +1,257 @@
+@prefix kg: <urn:kg:vocab:> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<urn:kg:vocab:shape/ofev/AssetType> a sh:NodeShape ;
+    sh:property [ sh:message "AssetType: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:AssetType .
+
+<urn:kg:vocab:shape/ofev/Audience> a sh:NodeShape ;
+    sh:property [ sh:message "Audience: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:Audience .
+
+<urn:kg:vocab:shape/ofev/Brand> a sh:NodeShape ;
+    sh:property [ sh:message "Brand: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:Brand .
+
+<urn:kg:vocab:shape/ofev/Channel> a sh:NodeShape ;
+    sh:property [ sh:message "Channel: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:Channel .
+
+<urn:kg:vocab:shape/ofev/Chunk> a sh:NodeShape ;
+    sh:property [ sh:message "Chunk: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "Chunk: required field 'chunk_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:chunk_id ] ;
+    sh:targetClass kg:Chunk .
+
+<urn:kg:vocab:shape/ofev/Claim> a sh:NodeShape ;
+    sh:property [ sh:message "Claim: required field 'claim_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:claim_text ],
+        [ sh:message "Claim: required relationship CLAIM_SUPPORTED_BY_REFERENCE is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:CLAIM_SUPPORTED_BY_REFERENCE ],
+        [ sh:message "Claim: required field 'indication' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:indication ],
+        [ sh:in ( "approved" ) ;
+            sh:path kg:claim_status ],
+        [ sh:message "Claim: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ] ;
+    sh:targetClass kg:Claim .
+
+<urn:kg:vocab:shape/ofev/ClinicalTrial> a sh:NodeShape ;
+    sh:property [ sh:message "ClinicalTrial: required field 'trial_name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:trial_name ],
+        [ sh:message "ClinicalTrial: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ] ;
+    sh:targetClass kg:ClinicalTrial .
+
+<urn:kg:vocab:shape/ofev/ComplianceRule> a sh:NodeShape ;
+    sh:property [ sh:message "ComplianceRule: required field 'market' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:market ],
+        [ sh:in ( "critical" "high" "low" "medium" ) ;
+            sh:message "ComplianceRule: required field 'severity' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:severity ],
+        [ sh:message "ComplianceRule: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "ComplianceRule: required field 'rule_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:rule_text ] ;
+    sh:targetClass kg:ComplianceRule .
+
+<urn:kg:vocab:shape/ofev/ContentModule> a sh:NodeShape ;
+    sh:property [ sh:message "ContentModule: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:in ( "approved" "draft" "pending" "rejected" ) ;
+            sh:path kg:approval_status ],
+        [ sh:message "ContentModule: required field 'module_name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:module_name ] ;
+    sh:targetClass kg:ContentModule .
+
+<urn:kg:vocab:shape/ofev/Document> a sh:NodeShape ;
+    sh:property [ sh:message "Document: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "Document: required field 'source_file_name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_file_name ] ;
+    sh:targetClass kg:Document .
+
+<urn:kg:vocab:shape/ofev/EfficacyClaimRequiresSafety> a sh:NodeShape ;
+    sh:sparql [ sh:message "Efficacy claim has no CLAIM_REQUIRES_SAFETY link (ontology rule: every efficacy claim must carry the required Safety Information)" ;
+            sh:select """PREFIX kg: <urn:kg:vocab:>
+SELECT $this WHERE {
+  $this kg:key_message_type ?t .
+  FILTER(CONTAINS(LCASE(STR(?t)), "efficacy"))
+  FILTER NOT EXISTS { $this kg:CLAIM_REQUIRES_SAFETY ?s }
+}""" ] ;
+    sh:targetClass kg:Claim .
+
+<urn:kg:vocab:shape/ofev/GuardrailRule> a sh:NodeShape ;
+    sh:property [ sh:in ( "critical" "high" "low" "medium" ) ;
+            sh:message "GuardrailRule: required field 'severity' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:severity ],
+        [ sh:in ( "allow" "block" "escalate" "warn" ) ;
+            sh:message "GuardrailRule: required field 'decision' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:decision ],
+        [ sh:in ( "ai_disclosure" "brand_translation_governance" "consent" "mlr_signoff" "quality_evaluation" "terminology_management" "version_control" ) ;
+            sh:message "GuardrailRule: required field 'rule_type' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:rule_type ],
+        [ sh:message "GuardrailRule: required field 'rule_name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:rule_name ] ;
+    sh:targetClass kg:GuardrailRule .
+
+<urn:kg:vocab:shape/ofev/Indication> a sh:NodeShape ;
+    sh:property [ sh:message "Indication: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "Indication: required field 'indication_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:indication_text ],
+        [ sh:message "Indication: required field 'market' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:market ] ;
+    sh:targetClass kg:Indication .
+
+<urn:kg:vocab:shape/ofev/Market> a sh:NodeShape ;
+    sh:property [ sh:message "Market: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:Market .
+
+<urn:kg:vocab:shape/ofev/PISection> a sh:NodeShape ;
+    sh:property [ sh:message "PISection: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ] ;
+    sh:targetClass kg:PISection .
+
+<urn:kg:vocab:shape/ofev/Persona> a sh:NodeShape ;
+    sh:property [ sh:message "Persona: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:Persona .
+
+<urn:kg:vocab:shape/ofev/Product> a sh:NodeShape ;
+    sh:property [ sh:message "Product: required field 'active_ingredient' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:active_ingredient ],
+        [ sh:message "Product: required field 'brand' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:brand ],
+        [ sh:message "Product: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:Product .
+
+<urn:kg:vocab:shape/ofev/QualityCriterion> a sh:NodeShape ;
+    sh:property [ sh:message "QualityCriterion: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:QualityCriterion .
+
+<urn:kg:vocab:shape/ofev/Reference> a sh:NodeShape ;
+    sh:property [ sh:message "Reference: required field 'reference_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:reference_text ],
+        [ sh:message "Reference: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ] ;
+    sh:targetClass kg:Reference .
+
+<urn:kg:vocab:shape/ofev/RegulatoryFramework> a sh:NodeShape ;
+    sh:property [ sh:message "RegulatoryFramework: required field 'scope' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:scope ],
+        [ sh:message "RegulatoryFramework: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "RegulatoryFramework: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:RegulatoryFramework .
+
+<urn:kg:vocab:shape/ofev/RespiratoryOutcome> a sh:NodeShape ;
+    sh:property [ sh:message "RespiratoryOutcome: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "RespiratoryOutcome: required field 'outcome_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:outcome_text ] ;
+    sh:targetClass kg:RespiratoryOutcome .
+
+<urn:kg:vocab:shape/ofev/SafetyStatement> a sh:NodeShape ;
+    sh:property [ sh:message "SafetyStatement: required field 'statement_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:statement_text ],
+        [ sh:message "SafetyStatement: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ] ;
+    sh:targetClass kg:SafetyStatement .
+
+<urn:kg:vocab:shape/ofev/Section> a sh:NodeShape ;
+    sh:property [ sh:message "Section: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "Section: required field 'section_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:section_id ] ;
+    sh:targetClass kg:Section .
+
+<urn:kg:vocab:shape/ofev/ServiceLine> a sh:NodeShape ;
+    sh:property [ sh:message "ServiceLine: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:ServiceLine .
+
+<urn:kg:vocab:shape/ofev/Table> a sh:NodeShape ;
+    sh:property [ sh:message "Table: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "Table: required field 'table_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:table_id ] ;
+    sh:targetClass kg:Table .
+
+<urn:kg:vocab:shape/ofev/ToneRule> a sh:NodeShape ;
+    sh:property [ sh:message "ToneRule: required field 'rule_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:rule_text ],
+        [ sh:message "ToneRule: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ] ;
+    sh:targetClass kg:ToneRule .
+
+<urn:kg:vocab:shape/ofev/VisualRule> a sh:NodeShape ;
+    sh:property [ sh:message "VisualRule: required field 'rule_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:rule_text ],
+        [ sh:message "VisualRule: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ] ;
+    sh:targetClass kg:VisualRule .
+

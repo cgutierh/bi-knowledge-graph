@@ -1,0 +1,20 @@
+@prefix kg: <urn:kg:vocab:> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<urn:kg:enterprise:market:region:usa> a kg:Market ;
+    rdfs:label "USA" ;
+    kg:graphScope "enterprise" ;
+    kg:name "USA" ;
+    kg:source_document_id "af71b132-580d-4e61-9318-1237237b3e05" ;
+    kg:source_document_type "ai_disclosure_matrix" ;
+    kg:source_file_name "ai_disclosure_matrix.xlsx" .
+
+<urn:kg:enterprise:market:usa> a kg:Market ;
+    rdfs:label "USA" ;
+    kg:graphScope "enterprise" ;
+    kg:name "USA" ;
+    kg:region "USA" ;
+    kg:source_document_id "af71b132-580d-4e61-9318-1237237b3e05" ;
+    kg:source_document_type "ai_disclosure_matrix" ;
+    kg:source_file_name "ai_disclosure_matrix.xlsx" .
+

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BI Knowledge Graph README</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,600..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+/* Layout: single readable column of documentation, two parts (web app, reconstruction package) */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --sunk:#eaeef1; --ink:#14202b; --muted:#5b6b78; --line:#d6dde3; --accent:#0d6f8a; --warn:#b8681d;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f161c;--surface:#16212a;--sunk:#121b23;--ink:#e3eaf0;--muted:#93a3b0;--line:#2a3946;--accent:#4fb3cf;--warn:#ffb057;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f161c;--surface:#16212a;--sunk:#121b23;--ink:#e3eaf0;--muted:#93a3b0;--line:#2a3946;--accent:#4fb3cf;--warn:#ffb057;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-stretch:78%;font-weight:800;font-size:clamp(30px,5vw,42px);line-height:1.05;margin:6px 0 10px;text-wrap:balance}
+h2{font-family:var(--display);font-stretch:82%;font-weight:750;font-size:25px;margin:44px 0 6px;padding-top:14px;border-top:1.5px solid var(--ink);text-wrap:balance}
+h3{font-family:var(--display);font-stretch:88%;font-weight:650;font-size:18px;margin:26px 0 6px}
+p,li{max-width:70ch}
+p{margin:8px 0}
+ul,ol{padding-left:22px;margin:8px 0}
+li{margin:4px 0}
+code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 5px}
+pre{font-family:var(--mono);font-size:13.5px;background:var(--surface);border:1px solid var(--line);padding:14px 16px;overflow-x:auto;margin:10px 0}
+pre code{background:none;padding:0}
+.tw{overflow-x:auto;border:1px solid var(--line);background:var(--surface);margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-family:var(--mono);font-weight:500;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+td:first-child{font-family:var(--mono);font-size:13px;color:var(--accent);white-space:nowrap}
+.note{border-left:3px solid var(--warn);background:var(--surface);padding:10px 14px;margin:14px 0}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
+.toc a{font-family:var(--mono);font-size:12.5px;color:var(--ink);border:1px solid var(--line);background:var(--surface);padding:5px 10px;text-decoration:none}
+.toc a:hover{border-color:var(--ink)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="eyebrow">Documentación · <a href="index.html" style="color:inherit">Explorador web</a> · <a href="auditoria.html" style="color:inherit">Auditoría</a></div>
+  <h1>BI Knowledge Graph README</h1>
+  <p>Cómo usar, publicar y actualizar la interfaz web del grafo, y qué contiene el paquete de reconstrucción semántica.</p>
+  <nav class="toc" aria-label="Contenido">
+    <a href="#web">1 · Interfaz web</a>
+    <a href="#reconstruccion">2 · Paquete de reconstrucción</a>
+  </nav>
+
+  <h2 id="web">1 · Interfaz web (BI_KG_web.zip)</h2>
+  <p>Es una aplicación estática que no necesita backend. La búsqueda, las fichas de nodo y el vecindario funcionan con <code>data/kg.json</code>. Las consultas SPARQL usan Oxigraph (WebAssembly), que se ejecuta en el navegador sobre <code>data/kg.trig</code> y <code>data/ontology.ttl</code>.</p>
+
+  <h3>Contenido de la carpeta</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Archivo</th><th>Qué es</th></tr></thead>
+    <tbody>
+      <tr><td>index.html</td><td>La aplicación: búsqueda, fichas, SPARQL y esquema.</td></tr>
+      <tr><td>data/kg.json</td><td>Los 4.912 nodos y 7.598 relaciones en formato compacto, que usa el explorador.</td></tr>
+      <tr><td>data/kg.trig</td><td>El dataset RDF completo, con un grafo con nombre por marca, que usa SPARQL.</td></tr>
+      <tr><td>data/ontology.ttl</td><td>La ontología OWL reconstruida.</td></tr>
+      <tr><td>vendor/oxigraph_bg.wasm</td><td>El motor SPARQL Oxigraph 0.5.11 (licencia MIT / Apache-2.0).</td></tr>
+      <tr><td>webdata.py</td><td>Script que genera <code>data/kg.json</code> a partir del export original.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Probarla en tu ordenador</h3>
+  <p>Tiene que servirse por HTTP: si abres <code>index.html</code> con doble clic, el navegador no deja cargar los datos.</p>
+<pre><code>cd bi-kg-web
+python3 -m http.server 8000
+# abre http://localhost:8000</code></pre>
+
+  <h3>Publicarla</h3>
+  <ul>
+    <li>Copia la carpeta <code>bi-kg-web</code> tal cual a cualquier hosting estático: Netlify, Vercel, GitHub Pages, S3 + CloudFront o un nginx interno.</li>
+    <li>El servidor tiene que entregar los <code>.wasm</code> como <code>application/wasm</code>. Los servidores habituales ya lo hacen.</li>
+    <li>Necesita conexión a internet para cargar d3 (cdnjs) y las tipografías (Google Fonts). Sin d3 no se dibuja el mapa de vecindario, pero el resto funciona; sin las tipografías se usan las del sistema.</li>
+  </ul>
+  <div class="note">Los datos van dentro de la carpeta y cualquiera que tenga la URL podrá verlos. Si el contenido es confidencial, publícala en un hosting con acceso restringido, como una intranet o un hosting con autenticación.</div>
+
+  <h3>Cómo se usa</h3>
+  <ul>
+    <li><b>Buscar:</b> texto libre; <code>"frase exacta"</code> entre comillas; o <code>campo:valor</code> para buscar un valor exacto en un campo, por ejemplo <code>claim_status:approved</code>, <code>claim_status:candidate</code> o <code>key_message_type:efficacy</code>. Puedes combinarlos: <code>key_message_type:efficacy ckd</code>.</li>
+    <li><b>Explorar:</b> filtra por grafo y tipo. Pulsa un nodo para ver su procedencia, sus propiedades, su vecindario y sus relaciones. Todos los enlaces llevan a otros nodos.</li>
+    <li><b>SPARQL:</b> elige una consulta preparada o escribe la tuya, y ejecútala con el botón o con Ctrl/Cmd + Enter. Todos los grafos se consultan como uno solo; para separar por marca usa <code>GRAPH ?g { … }</code>. Prefijo del vocabulario: <code>PREFIX kg: &lt;urn:kg:vocab:&gt;</code>.</li>
+    <li><b>Esquema:</b> clases y relaciones con sus recuentos. Pulsa una clase para listar sus nodos.</li>
+  </ul>
+
+  <h3>Actualizar los datos</h3>
+  <ol>
+    <li>Regenera el RDF con <code>build.py</code> del paquete de reconstrucción: <code>python3 build.py &lt;carpeta_export&gt; &lt;carpeta_salida&gt;</code>.</li>
+    <li>Genera el JSON del explorador: <code>python3 webdata.py &lt;carpeta_export&gt; data</code>.</li>
+    <li>Copia <code>rdf/bi_kg_all.trig</code> como <code>data/kg.trig</code> y <code>ontology/bi_kg_ontology.ttl</code> como <code>data/ontology.ttl</code>.</li>
+  </ol>
+
+  <h2 id="reconstruccion">2 · Paquete de reconstrucción (BI_KG_reconstruido.zip)</h2>
+  <p>Origen: <code>BI_Knowledge_Graph_Export</code>, exportado el 29-sep-2026. Contiene tres grafos de marca: <code>boehringer-ingelheim</code> («Life Forward»), <code>jardiance</code> y <code>ofev</code>, más 2 nodos compartidos de ámbito enterprise. En total, 4.912 nodos y 7.599 relaciones.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Archivo</th><th>Contenido</th><th>Herramientas</th></tr></thead>
+    <tbody>
+      <tr><td>ontology/bi_kg_ontology.ttl</td><td>Ontología OWL/RDFS que une los 3 overlays: 31 clases más 3 superclases, 38 propiedades de objeto y 94 de datos.</td><td>Protégé, TopBraid, razonadores</td></tr>
+      <tr><td>ontology/shapes_&lt;marca&gt;.ttl</td><td>Formas SHACL de cada overlay: campos y relaciones obligatorios, valores permitidos y la regla de seguridad de los claims de eficacia.</td><td>pyshacl, TopBraid, GraphDB</td></tr>
+      <tr><td>rdf/bi_kg_all.trig</td><td>Dataset completo con grafos con nombre: uno por marca, uno enterprise y uno de metadatos (VoID).</td><td>GraphDB, Jena Fuseki, Stardog, Oxigraph</td></tr>
+      <tr><td>rdf/&lt;marca&gt;.ttl</td><td>El mismo contenido en Turtle, un archivo por grafo.</td><td>Cualquier herramienta RDF</td></tr>
+      <tr><td>jsonld/&lt;marca&gt;.graph.jsonld</td><td>El JSON-LD original corregido: <code>@graph</code> estándar y aristas como propiedades <code>@id</code>.</td><td>Cualquier procesador JSON-LD</td></tr>
+      <tr><td>graphml/bi_kg_all.graphml</td><td>Grafo de propiedades con todos los atributos.</td><td>Gephi, yEd, Cytoscape</td></tr>
+      <tr><td>neo4j/neo4j_import.cypher</td><td>Importación LOAD CSV sobre la carpeta <code>csv/</code> original, que hay que copiar a <code>import/csv/</code>. Este script no se ha ejecutado contra Neo4j.</td><td>Neo4j 5</td></tr>
+      <tr><td>validation/shacl_summary.json</td><td>Resultado de la validación SHACL por marca.</td><td></td></tr>
+      <tr><td>scripts/</td><td><code>build.py</code>, <code>validate.py</code> y <code>explorer_data.py</code>, para regenerar y volver a validar todo.</td><td>Python 3 + rdflib, pyshacl, networkx</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Decisiones de reconstrucción</h3>
+  <ul>
+    <li>Se mantienen las URN originales (<code>urn:kg:vocab:</code> para el vocabulario y <code>urn:kg:&lt;marca&gt;:…</code> para las instancias), así que todo sigue siendo compatible con el export.</li>
+    <li>Las aristas reificadas (<code>{source, target}</code>) se convierten en tripletas directas. Las aristas no tenían propiedades propias, así que no se pierde nada.</li>
+    <li>Se añaden 3 superclases: <code>DomainEntity</code>, que el export usaba sin declararla; <code>ProvenanceEntity</code>, subclase de <code>prov:Entity</code>; y <code>ClinicalOutcome</code>.</li>
+    <li><code>DERIVED_FROM_*</code> son subpropiedades de <code>prov:wasDerivedFrom</code>, y las relaciones de contención lo son de <code>dcterms:hasPart</code>.</li>
+    <li>Si la definición de una clase varía entre marcas, la definición base va en <code>skos:definition</code> y las variantes en <code>skos:scopeNote</code>, marcadas con <code>[marca]</code>.</li>
+    <li>Se añade un <code>rdfs:label</code> copiado de name, trial_name, module_name, sheet_name, nombre de archivo o section_title, para que los nodos sean legibles en las herramientas.</li>
+  </ul>
+
+  <h3>Validación</h3>
+  <ul>
+    <li><code>validate.py</code> vuelve a leer Turtle, JSON-LD y GraphML y los compara con el original: mismos nodos y tipos, mismas aristas y mismos valores de propiedades, con 0 diferencias.</li>
+    <li>SHACL: Life Forward y OFEV cumplen. Jardiance tiene 112 violaciones: claims de eficacia sin <code>CLAIM_REQUIRES_SAFETY</code>, de los que 62 están aprobados.</li>
+  </ul>
+</div>
+
+</body>
+</html>

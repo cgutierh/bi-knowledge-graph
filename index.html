@@ -1,0 +1,2075 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BI Knowledge Graph</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+/* Layout: sticky top bar (name, search, views) over a two-pane workbench — result list left, node record right; SPARQL and schema as full-width views */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --sunk:#eaeef1; --ink:#14202b; --muted:#5b6b78; --line:#d6dde3;
+  --accent:#0d6f8a; --accent-soft:#dcedf2;
+  --domain:#3b5bdb; --prov:#7a8691; --outcome:#b5179e; --claim:#d9480f; --rule:#2b8a3e; --market:#d9822b; --safety:#c92a2a;
+  --crit:#c92a2a; --warn:#b8681d; --ok:#2b8a3e;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f161c; --surface:#16212a; --sunk:#121b23; --ink:#e3eaf0; --muted:#93a3b0; --line:#2a3946;
+  --accent:#4fb3cf; --accent-soft:#163a46;
+  --domain:#7c95ff; --prov:#9aa6b0; --outcome:#e46fd0; --claim:#ff8a4c; --rule:#5fcf74; --market:#ffb057; --safety:#ff6b6b;
+  --crit:#ff6b6b; --warn:#ffb057; --ok:#5fcf74; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f161c; --surface:#16212a; --sunk:#121b23; --ink:#e3eaf0; --muted:#93a3b0; --line:#2a3946;
+  --accent:#4fb3cf; --accent-soft:#163a46;
+  --domain:#7c95ff; --prov:#9aa6b0; --outcome:#e46fd0; --claim:#ff8a4c; --rule:#5fcf74; --market:#ffb057; --safety:#ff6b6b;
+  --crit:#ff6b6b; --warn:#ffb057; --ok:#5fcf74; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14.5px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1.5px solid var(--ink)}
+.top-in{max-width:1320px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 20px;align-items:center}
+.brand{font-family:var(--display);font-stretch:78%;font-weight:800;font-size:22px;letter-spacing:-.01em;white-space:nowrap}
+.brand small{display:block;font-family:var(--mono);font-weight:400;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-stretch:100%}
+.search{display:flex;gap:8px;min-width:0}
+.search input{flex:1;min-width:0;font:inherit;font-size:15px;padding:8px 12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+.search input:focus{outline:none;border-color:var(--accent)}
+nav.views{grid-column:1/-1;display:flex;gap:2px;overflow-x:auto}
+nav.views button{font-family:var(--display);font-stretch:85%;font-weight:600;font-size:15px;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:6px 12px 7px;cursor:pointer;white-space:nowrap}
+nav.views .navlink{font-family:var(--display);font-stretch:85%;font-weight:600;font-size:15px;color:var(--muted);padding:6px 12px 7px;text-decoration:none;white-space:nowrap;border-bottom:3px solid transparent}
+nav.views .navlink:hover{color:var(--ink)}
+nav.views button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{max-width:1320px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+h1,h2,h3{font-family:var(--display);font-stretch:82%;margin:0;text-wrap:balance}
+h2{font-weight:750;font-size:26px;margin-bottom:4px}
+h3{font-weight:650;font-size:17px;font-stretch:88%}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.sub{color:var(--muted);margin:0 0 16px;max-width:75ch}
+.mono,code{font-family:var(--mono);font-size:.9em}
+.btn{font-family:var(--mono);font-size:12.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 11px;cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn[disabled]{opacity:.5;cursor:default}
+select{font-family:var(--mono);font-size:12.5px;padding:6px 8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);max-width:100%}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+/* home */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);padding:16px;min-width:0}
+.card .big{font-family:var(--display);font-stretch:80%;font-weight:750;font-size:24px;margin:2px 0 8px}
+.tchips{display:flex;flex-wrap:wrap;gap:6px}
+.tchip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:3px 8px;cursor:pointer}
+.tchip:hover{border-color:var(--ink)}
+.tchip b{font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
+.shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:20px}
+.shortcut{text-align:left;background:var(--surface);border:1px solid var(--line);padding:12px 14px;cursor:pointer;color:var(--ink);font:inherit}
+.shortcut:hover{border-color:var(--ink)}
+.shortcut .eyebrow{display:block;margin-bottom:3px}
+.shortcut.alert{border-left:3px solid var(--crit)}
+/* explore */
+.bench{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:16px;align-items:start}
+.listpane{background:var(--surface);border:1px solid var(--line);min-width:0}
+.filters{display:flex;flex-wrap:wrap;gap:6px;padding:10px;border-bottom:1px solid var(--line)}
+.filters select{flex:1;min-width:120px}
+.count{padding:8px 12px;font-family:var(--mono);font-size:11.5px;color:var(--muted);border-bottom:1px solid var(--line)}
+.results{list-style:none;margin:0;padding:0;max-height:calc(100vh - 260px);min-height:300px;overflow:auto}
+.results li button{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 9px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:9px 12px;cursor:pointer;color:var(--ink);font:inherit}
+.results li button:hover{background:var(--sunk)}
+.results li button[aria-current="true"]{background:var(--accent-soft)}
+.results .dot{margin-top:6px}
+.results .l{font-size:13.5px;overflow-wrap:anywhere}
+.results .m{grid-column:2;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.more{display:block;width:100%;padding:10px;border:0;background:var(--sunk);color:var(--ink);font-family:var(--mono);font-size:12px;cursor:pointer}
+.record{background:var(--surface);border:1px solid var(--line);padding:18px 20px;min-width:0}
+.record .empty{color:var(--muted)}
+.rhead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between}
+.rtitle{font-family:var(--display);font-stretch:85%;font-weight:700;font-size:22px;line-height:1.2;margin:4px 0 6px;overflow-wrap:anywhere}
+.idline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;color:var(--muted);overflow-wrap:anywhere}
+.crumbs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:12.5px;margin:10px 0 0}
+.crumbs button{background:none;border:0;padding:0;color:var(--accent);cursor:pointer;font:inherit;text-decoration:underline;text-underline-offset:3px;text-align:left}
+.crumbs span.sep{color:var(--muted)}
+.flag{border:1px solid var(--crit);color:var(--crit);padding:8px 12px;margin:12px 0 0;font-size:13.5px}
+.flag.warn{border-color:var(--warn);color:var(--warn)}
+.sec{margin-top:20px}
+.sec>.eyebrow{display:block;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.longtext{white-space:pre-wrap;font-size:14px;max-width:85ch;background:var(--sunk);padding:12px 14px;max-height:340px;overflow:auto;overflow-wrap:anywhere}
+dl.props{display:grid;grid-template-columns:minmax(120px,auto) minmax(0,1fr);gap:5px 16px;margin:0;font-size:13.5px}
+dl.props dt{font-family:var(--mono);font-size:12px;color:var(--muted)}
+dl.props dd{margin:0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.relgroup{margin:8px 0 12px}
+.relgroup h4{margin:0 0 4px;font-family:var(--mono);font-weight:500;font-size:12px;color:var(--ink)}
+.relgroup h4 span{color:var(--muted)}
+.rellist{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.rellist button{display:flex;gap:8px;align-items:baseline;background:none;border:0;padding:3px 0;color:var(--ink);cursor:pointer;font:inherit;font-size:13.5px;text-align:left}
+.rellist button:hover .l{text-decoration:underline}
+.rellist .t{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
+.neigh{height:300px;background:var(--sunk);border:1px solid var(--line);position:relative}
+.neigh svg{width:100%;height:100%;display:block}
+.neigh text{font-family:var(--mono);font-size:10px;fill:var(--ink);paint-order:stroke;stroke:var(--sunk);stroke-width:3px;pointer-events:none}
+.scroll{overflow-x:auto;border:1px solid var(--line);max-height:420px;overflow-y:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-family:var(--mono);font-weight:500;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;background:var(--surface)}
+td{max-width:520px;min-width:84px;overflow-wrap:anywhere}
+td a,td button.iri{color:var(--accent);background:none;border:0;padding:0;font:inherit;cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px}
+/* sparql */
+.sq{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+textarea{width:100%;min-height:230px;font-family:var(--mono);font-size:13px;line-height:1.5;padding:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);resize:vertical}
+textarea:focus{outline:none;border-color:var(--accent)}
+.sqbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 12px}
+.status{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.status.err{color:var(--crit)}
+.presets{display:grid;gap:6px}
+.presets button{text-align:left;background:var(--surface);border:1px solid var(--line);padding:9px 11px;cursor:pointer;color:var(--ink);font:inherit;font-size:13.5px}
+.presets button:hover{border-color:var(--ink)}
+.presets button small{display:block;color:var(--muted);font-size:12px}
+/* schema */
+.schema{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cls{background:var(--surface);border:1px solid var(--line);padding:12px 14px;min-width:0}
+.cls .row{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.cls p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.cls.unused{opacity:.65}
+.loading{padding:40px 0;color:var(--muted);font-family:var(--mono)}
+@media (max-width:980px){.cards{grid-template-columns:minmax(0,1fr)}.shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}.bench,.sq{grid-template-columns:minmax(0,1fr)}.results{max-height:380px}.schema{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.top-in{grid-template-columns:minmax(0,1fr)}.shortcuts{grid-template-columns:minmax(0,1fr)}dl.props{grid-template-columns:minmax(0,1fr)}dl.props dd{margin-bottom:6px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">BI Knowledge Graph<small>Life Forward · Jardiance · OFEV</small></div>
+    <form class="search" id="searchForm" role="search">
+      <input id="q" type="search" placeholder='Buscar: texto, "frase exacta" o campo:valor (claim_status:approved)' autocomplete="off" aria-label="Buscar en el grafo">
+      <button class="btn primary" type="submit">Buscar</button>
+    </form>
+    <nav class="views" role="tablist" aria-label="Vistas">
+      <button role="tab" data-view="inicio">Inicio</button>
+      <button role="tab" data-view="explorar">Explorar</button>
+      <button role="tab" data-view="sparql">SPARQL</button>
+      <button role="tab" data-view="esquema">Esquema</button>
+      <a class="navlink" href="auditoria.html">Auditoría</a>
+      <a class="navlink" href="readme.html">README</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="loading" id="loading">Cargando el grafo (4.912 nodos, 7.598 relaciones)…</div>
+
+  <section id="v-inicio" data-v hidden>
+    <h2>Grafos</h2>
+    <p class="sub">Tres grafos de marca y una capa enterprise compartida. Pulsa un tipo para listar sus nodos.</p>
+    <div class="cards" id="cards"></div>
+    <div class="shortcuts" id="shortcuts"></div>
+  </section>
+
+  <section id="v-explorar" data-v hidden>
+    <div class="bench">
+      <div class="listpane">
+        <div class="filters">
+          <select id="fKg" aria-label="Grafo"></select>
+          <select id="fType" aria-label="Tipo de nodo"></select>
+        </div>
+        <div class="count" id="count"></div>
+        <ul class="results" id="results"></ul>
+      </div>
+      <article class="record" id="record"><p class="empty">Selecciona un nodo de la lista, o busca arriba.</p></article>
+    </div>
+  </section>
+
+  <section id="v-sparql" data-v hidden>
+    <h2>Consultas SPARQL</h2>
+    <p class="sub">El motor (Oxigraph) se ejecuta en tu navegador sobre el dataset completo y la ontología. Todos los grafos con nombre se consultan como uno solo; usa <code>GRAPH ?g { … }</code> para separarlos por marca. Los resultados que son nodos se abren en Explorar.</p>
+    <div class="sq">
+      <div>
+        <label class="eyebrow" for="sq">Consulta</label>
+        <textarea id="sq" spellcheck="false"></textarea>
+        <div class="sqbar">
+          <button class="btn primary" id="run">Ejecutar</button>
+          <button class="btn" id="copyRes" disabled>Copiar resultados (TSV)</button>
+          <span class="status" id="sqStatus">El motor se carga al ejecutar la primera consulta.</span>
+        </div>
+        <div id="sqOut"></div>
+      </div>
+      <aside>
+        <div class="eyebrow" style="margin-bottom:6px">Consultas preparadas</div>
+        <div class="presets" id="presets"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="v-esquema" data-v hidden>
+    <h2>Esquema</h2>
+    <p class="sub">Clases de la ontología con su número de instancias. Las clases sin instancias están declaradas pero vacías. Pulsa una clase para listar sus nodos.</p>
+    <div class="schema" id="schema"></div>
+    <h3 style="margin:24px 0 8px">Relaciones</h3>
+    <div class="scroll" style="max-height:none"><table id="relTable"></table></div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+(function(){
+/* @ts-self-types="./web.d.ts" */
+
+class AsyncParserIterator {
+    static __wrap(ptr) {
+        const obj = Object.create(AsyncParserIterator.prototype);
+        obj.__wbg_ptr = ptr;
+        AsyncParserIteratorFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        AsyncParserIteratorFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_asyncparseriterator_free(ptr, 0);
+    }
+    /**
+     * @returns {Promise<ParserIteratorResult>}
+     */
+    next() {
+        const ret = wasm.asyncparseriterator_next(this.__wbg_ptr);
+        return ret;
+    }
+}
+if (Symbol.dispose) AsyncParserIterator.prototype[Symbol.dispose] = AsyncParserIterator.prototype.free;
+
+class BlankNode {
+    static __wrap(ptr) {
+        const obj = Object.create(BlankNode.prototype);
+        obj.__wbg_ptr = ptr;
+        BlankNodeFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        BlankNodeFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_blanknode_free(ptr, 0);
+    }
+    /**
+     * @param {any} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        const ret = wasm.blanknode_equals(this.__wbg_ptr, other);
+        return ret !== 0;
+    }
+    /**
+     * @returns {string}
+     */
+    get termType() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.blanknode_term_type(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    toString() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.blanknode_toString(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get value() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.blanknode_value(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+}
+if (Symbol.dispose) BlankNode.prototype[Symbol.dispose] = BlankNode.prototype.free;
+
+class DefaultGraph {
+    static __wrap(ptr) {
+        const obj = Object.create(DefaultGraph.prototype);
+        obj.__wbg_ptr = ptr;
+        DefaultGraphFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        DefaultGraphFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_defaultgraph_free(ptr, 0);
+    }
+    /**
+     * @param {any} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        const ret = wasm.defaultgraph_equals(this.__wbg_ptr, other);
+        return ret !== 0;
+    }
+    /**
+     * @returns {string}
+     */
+    get termType() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.defaultgraph_term_type(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    toString() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.defaultgraph_toString(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get value() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.defaultgraph_value(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+}
+if (Symbol.dispose) DefaultGraph.prototype[Symbol.dispose] = DefaultGraph.prototype.free;
+
+class Literal {
+    static __wrap(ptr) {
+        const obj = Object.create(Literal.prototype);
+        obj.__wbg_ptr = ptr;
+        LiteralFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        LiteralFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_literal_free(ptr, 0);
+    }
+    /**
+     * @returns {NamedNode}
+     */
+    get datatype() {
+        const ret = wasm.literal_datatype(this.__wbg_ptr);
+        return NamedNode.__wrap(ret);
+    }
+    /**
+     * @returns {string}
+     */
+    get direction() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.literal_direction(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @param {any} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        const ret = wasm.literal_equals(this.__wbg_ptr, other);
+        return ret !== 0;
+    }
+    /**
+     * @returns {string}
+     */
+    get language() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.literal_language(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get termType() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.literal_term_type(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    toString() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.literal_toString(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get value() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.literal_value(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+}
+if (Symbol.dispose) Literal.prototype[Symbol.dispose] = Literal.prototype.free;
+
+class NamedNode {
+    static __wrap(ptr) {
+        const obj = Object.create(NamedNode.prototype);
+        obj.__wbg_ptr = ptr;
+        NamedNodeFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        NamedNodeFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_namednode_free(ptr, 0);
+    }
+    /**
+     * @param {any} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        const ret = wasm.namednode_equals(this.__wbg_ptr, other);
+        return ret !== 0;
+    }
+    /**
+     * @returns {string}
+     */
+    get termType() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.namednode_term_type(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    toString() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.namednode_toString(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get value() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.namednode_value(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+}
+if (Symbol.dispose) NamedNode.prototype[Symbol.dispose] = NamedNode.prototype.free;
+
+class ParserIterator {
+    static __wrap(ptr) {
+        const obj = Object.create(ParserIterator.prototype);
+        obj.__wbg_ptr = ptr;
+        ParserIteratorFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        ParserIteratorFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_parseriterator_free(ptr, 0);
+    }
+    /**
+     * @returns {ParserIteratorResult}
+     */
+    next() {
+        const ret = wasm.parseriterator_next(this.__wbg_ptr);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return ParserIteratorResult.__wrap(ret[0]);
+    }
+}
+if (Symbol.dispose) ParserIterator.prototype[Symbol.dispose] = ParserIterator.prototype.free;
+
+class ParserIteratorResult {
+    static __wrap(ptr) {
+        const obj = Object.create(ParserIteratorResult.prototype);
+        obj.__wbg_ptr = ptr;
+        ParserIteratorResultFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        ParserIteratorResultFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_parseriteratorresult_free(ptr, 0);
+    }
+    /**
+     * @returns {boolean}
+     */
+    get done() {
+        const ret = wasm.parseriteratorresult_done(this.__wbg_ptr);
+        return ret !== 0;
+    }
+    /**
+     * @returns {Quad | undefined}
+     */
+    get value() {
+        const ret = wasm.parseriteratorresult_value(this.__wbg_ptr);
+        return ret === 0 ? undefined : Quad.__wrap(ret);
+    }
+}
+if (Symbol.dispose) ParserIteratorResult.prototype[Symbol.dispose] = ParserIteratorResult.prototype.free;
+
+class Quad {
+    static __wrap(ptr) {
+        const obj = Object.create(Quad.prototype);
+        obj.__wbg_ptr = ptr;
+        QuadFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        QuadFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_quad_free(ptr, 0);
+    }
+    /**
+     * @param {any} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        const ret = wasm.quad_equals(this.__wbg_ptr, other);
+        return ret !== 0;
+    }
+    /**
+     * @returns {any}
+     */
+    get graph() {
+        const ret = wasm.quad_graph(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @returns {any}
+     */
+    get object() {
+        const ret = wasm.quad_object(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @returns {any}
+     */
+    get predicate() {
+        const ret = wasm.quad_predicate(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @returns {any}
+     */
+    get subject() {
+        const ret = wasm.quad_subject(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @returns {string}
+     */
+    get termType() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.quad_term_type(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    toString() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.quad_toString(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get value() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.quad_value(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+}
+if (Symbol.dispose) Quad.prototype[Symbol.dispose] = Quad.prototype.free;
+
+class Store {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        StoreFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_store_free(ptr, 0);
+    }
+    /**
+     * @param {any} quad
+     */
+    add(quad) {
+        const ret = wasm.store_add(this.__wbg_ptr, quad);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
+     * @param {any} quad
+     */
+    delete(quad) {
+        const ret = wasm.store_delete(this.__wbg_ptr, quad);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
+     * @param {any} options
+     * @param {any} from_graph_name
+     * @returns {string}
+     */
+    dump(options, from_graph_name) {
+        let deferred2_0;
+        let deferred2_1;
+        try {
+            const ret = wasm.store_dump(this.__wbg_ptr, options, from_graph_name);
+            var ptr1 = ret[0];
+            var len1 = ret[1];
+            if (ret[3]) {
+                ptr1 = 0; len1 = 0;
+                throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred2_0 = ptr1;
+            deferred2_1 = len1;
+            return getStringFromWasm0(ptr1, len1);
+        } finally {
+            wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+        }
+    }
+    /**
+     * @param {any} quad
+     * @returns {boolean}
+     */
+    has(quad) {
+        const ret = wasm.store_has(this.__wbg_ptr, quad);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return ret[0] !== 0;
+    }
+    /**
+     * @param {any} data
+     * @param {any} options
+     * @param {any} base_iri
+     * @param {any} to_graph_name
+     */
+    load(data, options, base_iri, to_graph_name) {
+        const ret = wasm.store_load(this.__wbg_ptr, data, options, base_iri, to_graph_name);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
+     * @param {any} subject
+     * @param {any} predicate
+     * @param {any} object
+     * @param {any} graph_name
+     * @returns {Quad[]}
+     */
+    match(subject, predicate, object, graph_name) {
+        const ret = wasm.store_match(this.__wbg_ptr, subject, predicate, object, graph_name);
+        if (ret[3]) {
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        var v1 = getArrayJsValueFromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
+        return v1;
+    }
+    /**
+     * @param {any} quads
+     */
+    constructor(quads) {
+        const ret = wasm.store_new(quads);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        this.__wbg_ptr = ret[0];
+        StoreFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @param {string} query
+     * @param {any} options
+     * @returns {any}
+     */
+    query(query, options) {
+        const ptr0 = passStringToWasm0(query, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.store_query(this.__wbg_ptr, ptr0, len0, options);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return takeFromExternrefTable0(ret[0]);
+    }
+    /**
+     * @returns {number}
+     */
+    get size() {
+        const ret = wasm.store_size(this.__wbg_ptr);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return ret[0] >>> 0;
+    }
+    /**
+     * @param {string} update
+     * @param {any} options
+     */
+    update(update, options) {
+        const ptr0 = passStringToWasm0(update, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.store_update(this.__wbg_ptr, ptr0, len0, options);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+}
+if (Symbol.dispose) Store.prototype[Symbol.dispose] = Store.prototype.free;
+
+class Variable {
+    static __wrap(ptr) {
+        const obj = Object.create(Variable.prototype);
+        obj.__wbg_ptr = ptr;
+        VariableFinalization.register(obj, obj.__wbg_ptr, obj);
+        return obj;
+    }
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        VariableFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_variable_free(ptr, 0);
+    }
+    /**
+     * @param {any} other
+     * @returns {boolean}
+     */
+    equals(other) {
+        const ret = wasm.variable_equals(this.__wbg_ptr, other);
+        return ret !== 0;
+    }
+    /**
+     * @returns {string}
+     */
+    get termType() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.variable_term_type(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    toString() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.variable_toString(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * @returns {string}
+     */
+    get value() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.variable_value(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+}
+if (Symbol.dispose) Variable.prototype[Symbol.dispose] = Variable.prototype.free;
+
+/**
+ * @param {string | null} [value]
+ * @returns {BlankNode}
+ */
+function blankNode(value) {
+    var ptr0 = isLikeNone(value) ? 0 : passStringToWasm0(value, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    var len0 = WASM_VECTOR_LEN;
+    const ret = wasm.blankNode(ptr0, len0);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return BlankNode.__wrap(ret[0]);
+}
+
+/**
+ * @returns {DefaultGraph}
+ */
+function defaultGraph() {
+    const ret = wasm.defaultGraph();
+    return DefaultGraph.__wrap(ret);
+}
+
+/**
+ * @param {any} original
+ * @returns {any}
+ */
+function fromQuad(original) {
+    const ret = wasm.fromQuad(original);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
+ * @param {any} original
+ * @returns {any}
+ */
+function fromTerm(original) {
+    const ret = wasm.fromTerm(original);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
+ * @param {string | null | undefined} value
+ * @param {any} language_or_datatype
+ * @returns {Literal}
+ */
+function literal(value, language_or_datatype) {
+    var ptr0 = isLikeNone(value) ? 0 : passStringToWasm0(value, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    var len0 = WASM_VECTOR_LEN;
+    const ret = wasm.literal(ptr0, len0, language_or_datatype);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return Literal.__wrap(ret[0]);
+}
+
+function main() {
+    wasm.main();
+}
+
+/**
+ * @param {string} value
+ * @returns {NamedNode}
+ */
+function namedNode(value) {
+    const ptr0 = passStringToWasm0(value, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.namedNode(ptr0, len0);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return NamedNode.__wrap(ret[0]);
+}
+
+/**
+ * @param {any} input
+ * @param {any} options
+ * @returns {any}
+ */
+function parse(input, options) {
+    const ret = wasm.parse(input, options);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
+ * @param {any} subject
+ * @param {any} predicate
+ * @param {any} object
+ * @param {any} graph
+ * @returns {Quad}
+ */
+function quad(subject, predicate, object, graph) {
+    const ret = wasm.quad(subject, predicate, object, graph);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return Quad.__wrap(ret[0]);
+}
+
+/**
+ * @param {any} subject
+ * @param {any} predicate
+ * @param {any} object
+ * @returns {Quad}
+ */
+function triple(subject, predicate, object) {
+    const ret = wasm.triple(subject, predicate, object);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return Quad.__wrap(ret[0]);
+}
+
+/**
+ * @param {string} value
+ * @returns {Variable}
+ */
+function variable(value) {
+    const ptr0 = passStringToWasm0(value, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.variable(ptr0, len0);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return Variable.__wrap(ret[0]);
+}
+function __wbg_get_imports() {
+    const import0 = {
+        __proto__: null,
+        __wbg_Error_fdd633d4bb5dd76a: function(arg0, arg1) {
+            const ret = Error(getStringFromWasm0(arg0, arg1));
+            return ret;
+        },
+        __wbg___wbindgen_debug_string_8a447059637473e2: function(arg0, arg1) {
+            const ret = debugString(arg1);
+            const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const len1 = WASM_VECTOR_LEN;
+            getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+            getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+        },
+        __wbg___wbindgen_is_falsy_863e44ed68df4b26: function(arg0) {
+            const ret = !arg0;
+            return ret;
+        },
+        __wbg___wbindgen_is_function_acc5528be2b923f2: function(arg0) {
+            const ret = typeof(arg0) === 'function';
+            return ret;
+        },
+        __wbg___wbindgen_is_null_6d937fbfb6478470: function(arg0) {
+            const ret = arg0 === null;
+            return ret;
+        },
+        __wbg___wbindgen_is_object_0beba4a1980d3eea: function(arg0) {
+            const val = arg0;
+            const ret = typeof(val) === 'object' && val !== null;
+            return ret;
+        },
+        __wbg___wbindgen_is_string_1fca8072260dd261: function(arg0) {
+            const ret = typeof(arg0) === 'string';
+            return ret;
+        },
+        __wbg___wbindgen_is_undefined_721f8decd50c87a3: function(arg0) {
+            const ret = arg0 === undefined;
+            return ret;
+        },
+        __wbg___wbindgen_string_get_71bb4348194e31f0: function(arg0, arg1) {
+            const obj = arg1;
+            const ret = typeof(obj) === 'string' ? obj : undefined;
+            var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var len1 = WASM_VECTOR_LEN;
+            getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+            getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+        },
+        __wbg___wbindgen_throw_ea4887a5f8f9a9db: function(arg0, arg1) {
+            throw new Error(getStringFromWasm0(arg0, arg1));
+        },
+        __wbg__wbg_cb_unref_33c39e13d73b25f6: function(arg0) {
+            arg0._wbg_cb_unref();
+        },
+        __wbg_asyncIterator_523a9858481ea9a3: function() {
+            const ret = Symbol.asyncIterator;
+            return ret;
+        },
+        __wbg_asyncparseriterator_new: function(arg0) {
+            const ret = AsyncParserIterator.__wrap(arg0);
+            return ret;
+        },
+        __wbg_blanknode_new: function(arg0) {
+            const ret = BlankNode.__wrap(arg0);
+            return ret;
+        },
+        __wbg_call_5575218572ead796: function() { return handleError(function (arg0, arg1, arg2) {
+            const ret = arg0.call(arg1, arg2);
+            return ret;
+        }, arguments); },
+        __wbg_call_8e98ed2f3c86c4b5: function() { return handleError(function (arg0, arg1) {
+            const ret = arg0.call(arg1);
+            return ret;
+        }, arguments); },
+        __wbg_defaultgraph_new: function(arg0) {
+            const ret = DefaultGraph.__wrap(arg0);
+            return ret;
+        },
+        __wbg_done_b62d4a7d2286852a: function(arg0) {
+            const ret = arg0.done;
+            return ret;
+        },
+        __wbg_error_a6fa202b58aa1cd3: function(arg0, arg1) {
+            let deferred0_0;
+            let deferred0_1;
+            try {
+                deferred0_0 = arg0;
+                deferred0_1 = arg1;
+                console.error(getStringFromWasm0(arg0, arg1));
+            } finally {
+                wasm.__wbindgen_free(deferred0_0, deferred0_1, 1);
+            }
+        },
+        __wbg_getRandomValues_3f44b700395062e5: function() { return handleError(function (arg0, arg1) {
+            globalThis.crypto.getRandomValues(getArrayU8FromWasm0(arg0, arg1));
+        }, arguments); },
+        __wbg_get_9a29be2cb383ed9a: function() { return handleError(function (arg0, arg1) {
+            const ret = Reflect.get(arg0, arg1);
+            return ret;
+        }, arguments); },
+        __wbg_get_dddb90ff5d27a080: function() { return handleError(function (arg0, arg1) {
+            const ret = Reflect.get(arg0, arg1);
+            return ret;
+        }, arguments); },
+        __wbg_has_4f060fe202ad7e87: function() { return handleError(function (arg0, arg1) {
+            const ret = Reflect.has(arg0, arg1);
+            return ret;
+        }, arguments); },
+        __wbg_instanceof_Uint8Array_f080092dc70f5d58: function(arg0) {
+            let result;
+            try {
+                result = arg0 instanceof Uint8Array;
+            } catch (_) {
+                result = false;
+            }
+            const ret = result;
+            return ret;
+        },
+        __wbg_iterator_cc47ba25a2be735a: function() {
+            const ret = Symbol.iterator;
+            return ret;
+        },
+        __wbg_length_589238bdcf171f0e: function(arg0) {
+            const ret = arg0.length;
+            return ret;
+        },
+        __wbg_literal_new: function(arg0) {
+            const ret = Literal.__wrap(arg0);
+            return ret;
+        },
+        __wbg_namednode_new: function(arg0) {
+            const ret = NamedNode.__wrap(arg0);
+            return ret;
+        },
+        __wbg_new_227d7c05414eb861: function() {
+            const ret = new Error();
+            return ret;
+        },
+        __wbg_new_3444eb7412549f0b: function() {
+            const ret = new Map();
+            return ret;
+        },
+        __wbg_new_36e147a8ced3c6e0: function() {
+            const ret = new Array();
+            return ret;
+        },
+        __wbg_new_aafdf86a292b3ca7: function(arg0, arg1) {
+            const ret = new URIError(getStringFromWasm0(arg0, arg1));
+            return ret;
+        },
+        __wbg_new_e66a4b7758dd2e5c: function(arg0, arg1) {
+            const ret = new Error(getStringFromWasm0(arg0, arg1));
+            return ret;
+        },
+        __wbg_new_typed_00a409eb4ec4f2d9: function(arg0, arg1) {
+            try {
+                var state0 = {a: arg0, b: arg1};
+                var cb0 = (arg0, arg1) => {
+                    const a = state0.a;
+                    state0.a = 0;
+                    try {
+                        return wasm_bindgen_3570503f97ca7d70___convert__closures_____invoke___js_sys_bacb158c025087a0___Function_fn_wasm_bindgen_3570503f97ca7d70___JsValue_____wasm_bindgen_3570503f97ca7d70___sys__Undefined___js_sys_bacb158c025087a0___Function_fn_wasm_bindgen_3570503f97ca7d70___JsValue_____wasm_bindgen_3570503f97ca7d70___sys__Undefined_______true_(a, state0.b, arg0, arg1);
+                    } finally {
+                        state0.a = a;
+                    }
+                };
+                const ret = new Promise(cb0);
+                return ret;
+            } finally {
+                state0.a = 0;
+            }
+        },
+        __wbg_next_0c4066e251d2eff9: function() { return handleError(function (arg0) {
+            const ret = arg0.next();
+            return ret;
+        }, arguments); },
+        __wbg_next_402fa10b59ab20c3: function(arg0) {
+            const ret = arg0.next;
+            return ret;
+        },
+        __wbg_next_e8d68f27c98c4764: function() { return handleError(function (arg0) {
+            const ret = arg0.next();
+            return ret;
+        }, arguments); },
+        __wbg_now_d2e0afbad4edbe82: function() {
+            const ret = Date.now();
+            return ret;
+        },
+        __wbg_parseriterator_new: function(arg0) {
+            const ret = ParserIterator.__wrap(arg0);
+            return ret;
+        },
+        __wbg_parseriteratorresult_new: function(arg0) {
+            const ret = ParserIteratorResult.__wrap(arg0);
+            return ret;
+        },
+        __wbg_prototypesetcall_d721637c7ca66eb8: function(arg0, arg1, arg2) {
+            Uint8Array.prototype.set.call(getArrayU8FromWasm0(arg0, arg1), arg2);
+        },
+        __wbg_push_f724b5db8acf89d2: function(arg0, arg1) {
+            const ret = arg0.push(arg1);
+            return ret;
+        },
+        __wbg_quad_new: function(arg0) {
+            const ret = Quad.__wrap(arg0);
+            return ret;
+        },
+        __wbg_queueMicrotask_1c9b3800e321a967: function(arg0) {
+            const ret = arg0.queueMicrotask;
+            return ret;
+        },
+        __wbg_queueMicrotask_311744e534a929a3: function(arg0) {
+            queueMicrotask(arg0);
+        },
+        __wbg_resolve_d82363d90af6928a: function(arg0) {
+            const ret = Promise.resolve(arg0);
+            return ret;
+        },
+        __wbg_set_4564f7dc44fcb0c9: function() { return handleError(function (arg0, arg1, arg2) {
+            const ret = Reflect.set(arg0, arg1, arg2);
+            return ret;
+        }, arguments); },
+        __wbg_set_9a1d61e17de7054c: function(arg0, arg1, arg2) {
+            const ret = arg0.set(arg1, arg2);
+            return ret;
+        },
+        __wbg_stack_3b0d974bbf31e44f: function(arg0, arg1) {
+            const ret = arg1.stack;
+            const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const len1 = WASM_VECTOR_LEN;
+            getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+            getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+        },
+        __wbg_static_accessor_GLOBAL_THIS_2fee5048bcca5938: function() {
+            const ret = typeof globalThis === 'undefined' ? null : globalThis;
+            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+        },
+        __wbg_static_accessor_GLOBAL_ce44e66a4935da8c: function() {
+            const ret = typeof global === 'undefined' ? null : global;
+            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+        },
+        __wbg_static_accessor_SELF_44f6e0cb5e67cdad: function() {
+            const ret = typeof self === 'undefined' ? null : self;
+            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+        },
+        __wbg_static_accessor_WINDOW_168f178805d978fe: function() {
+            const ret = typeof window === 'undefined' ? null : window;
+            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+        },
+        __wbg_then_05edfc8a4fea5106: function(arg0, arg1, arg2) {
+            const ret = arg0.then(arg1, arg2);
+            return ret;
+        },
+        __wbg_then_591b6b3a75ee817a: function(arg0, arg1) {
+            const ret = arg0.then(arg1);
+            return ret;
+        },
+        __wbg_value_49f783bb59765962: function(arg0) {
+            const ret = arg0.value;
+            return ret;
+        },
+        __wbg_variable_new: function(arg0) {
+            const ret = Variable.__wrap(arg0);
+            return ret;
+        },
+        __wbg_warn_51d35a4c740f6509: function(arg0, arg1) {
+            console.warn(getStringFromWasm0(arg0, arg1));
+        },
+        __wbindgen_cast_0000000000000001: function(arg0, arg1) {
+            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 97, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
+            const ret = makeMutClosure(arg0, arg1, wasm_bindgen_3570503f97ca7d70___convert__closures_____invoke___wasm_bindgen_3570503f97ca7d70___JsValue__core_f0fd674eaa06beef___result__Result_____wasm_bindgen_3570503f97ca7d70___JsError___true_);
+            return ret;
+        },
+        __wbindgen_cast_0000000000000002: function(arg0, arg1) {
+            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [], shim_idx: 42, ret: Externref, inner_ret: Some(Externref) }, mutable: false }) -> Externref`.
+            const ret = makeClosure(arg0, arg1, wasm_bindgen_3570503f97ca7d70___convert__closures_____invoke___wasm_bindgen_3570503f97ca7d70___JsValue__true_);
+            return ret;
+        },
+        __wbindgen_cast_0000000000000003: function(arg0, arg1) {
+            // Cast intrinsic for `Ref(String) -> Externref`.
+            const ret = getStringFromWasm0(arg0, arg1);
+            return ret;
+        },
+        __wbindgen_cast_0000000000000004: function(arg0, arg1) {
+            var v0 = getArrayJsValueFromWasm0(arg0, arg1).slice();
+            wasm.__wbindgen_free(arg0, arg1 * 4, 4);
+            // Cast intrinsic for `Vector(NamedExternref("Quad")) -> Externref`.
+            const ret = v0;
+            return ret;
+        },
+        __wbindgen_init_externref_table: function() {
+            const table = wasm.__wbindgen_externrefs;
+            const offset = table.grow(4);
+            table.set(0, undefined);
+            table.set(offset + 0, undefined);
+            table.set(offset + 1, null);
+            table.set(offset + 2, true);
+            table.set(offset + 3, false);
+        },
+    };
+    return {
+        __proto__: null,
+        "./web_bg.js": import0,
+    };
+}
+
+function wasm_bindgen_3570503f97ca7d70___convert__closures_____invoke___wasm_bindgen_3570503f97ca7d70___JsValue__true_(arg0, arg1) {
+    const ret = wasm.wasm_bindgen_3570503f97ca7d70___convert__closures_____invoke___wasm_bindgen_3570503f97ca7d70___JsValue__true_(arg0, arg1);
+    return ret;
+}
+
+function wasm_bindgen_3570503f97ca7d70___convert__closures_____invoke___wasm_bindgen_3570503f97ca7d70___JsValue__core_f0fd674eaa06beef___result__Result_____wasm_bindgen_3570503f97ca7d70___JsError___true_(arg0, arg1, arg2) {
+    const ret = wasm.wasm_bindgen_3570503f97ca7d70___convert__closures_____invoke___wasm_bindgen_3570503f97ca7d70___JsValue__core_f0fd674eaa06beef___result__Result_____wasm_bindgen_3570503f97ca7d70___JsError___true_(arg0, arg1, arg2);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+function wasm_bindgen_3570503f97ca7d70___convert__closures_____invoke___js_sys_bacb158c025087a0___Function_fn_wasm_bindgen_3570503f97ca7d70___JsValue_____wasm_bindgen_3570503f97ca7d70___sys__Undefined___js_sys_bacb158c025087a0___Function_fn_wasm_bindgen_3570503f97ca7d70___JsValue_____wasm_bindgen_3570503f97ca7d70___sys__Undefined_______true_(arg0, arg1, arg2, arg3) {
+    wasm.wasm_bindgen_3570503f97ca7d70___convert__closures_____invoke___js_sys_bacb158c025087a0___Function_fn_wasm_bindgen_3570503f97ca7d70___JsValue_____wasm_bindgen_3570503f97ca7d70___sys__Undefined___js_sys_bacb158c025087a0___Function_fn_wasm_bindgen_3570503f97ca7d70___JsValue_____wasm_bindgen_3570503f97ca7d70___sys__Undefined_______true_(arg0, arg1, arg2, arg3);
+}
+
+const AsyncParserIteratorFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_asyncparseriterator_free(ptr, 1));
+const BlankNodeFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_blanknode_free(ptr, 1));
+const DefaultGraphFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_defaultgraph_free(ptr, 1));
+const LiteralFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_literal_free(ptr, 1));
+const NamedNodeFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_namednode_free(ptr, 1));
+const ParserIteratorFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_parseriterator_free(ptr, 1));
+const ParserIteratorResultFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_parseriteratorresult_free(ptr, 1));
+const QuadFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_quad_free(ptr, 1));
+const StoreFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_store_free(ptr, 1));
+const VariableFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_variable_free(ptr, 1));
+
+function addToExternrefTable0(obj) {
+    const idx = wasm.__externref_table_alloc();
+    wasm.__wbindgen_externrefs.set(idx, obj);
+    return idx;
+}
+
+const CLOSURE_DTORS = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(state => wasm.__wbindgen_destroy_closure(state.a, state.b));
+
+function debugString(val) {
+    // primitive types
+    const type = typeof val;
+    if (type == 'number' || type == 'boolean' || val == null) {
+        return  `${val}`;
+    }
+    if (type == 'string') {
+        return `"${val}"`;
+    }
+    if (type == 'symbol') {
+        const description = val.description;
+        if (description == null) {
+            return 'Symbol';
+        } else {
+            return `Symbol(${description})`;
+        }
+    }
+    if (type == 'function') {
+        const name = val.name;
+        if (typeof name == 'string' && name.length > 0) {
+            return `Function(${name})`;
+        } else {
+            return 'Function';
+        }
+    }
+    // objects
+    if (Array.isArray(val)) {
+        const length = val.length;
+        let debug = '[';
+        if (length > 0) {
+            debug += debugString(val[0]);
+        }
+        for(let i = 1; i < length; i++) {
+            debug += ', ' + debugString(val[i]);
+        }
+        debug += ']';
+        return debug;
+    }
+    // Test for built-in
+    const builtInMatches = /\[object ([^\]]+)\]/.exec(toString.call(val));
+    let className;
+    if (builtInMatches && builtInMatches.length > 1) {
+        className = builtInMatches[1];
+    } else {
+        // Failed to match the standard '[object ClassName]'
+        return toString.call(val);
+    }
+    if (className == 'Object') {
+        // we're a user defined class or Object
+        // JSON.stringify avoids problems with cycles, and is generally much
+        // easier than looping through ownProperties of `val`.
+        try {
+            return 'Object(' + JSON.stringify(val) + ')';
+        } catch (_) {
+            return 'Object';
+        }
+    }
+    // errors
+    if (val instanceof Error) {
+        return `${val.name}: ${val.message}\n${val.stack}`;
+    }
+    // TODO we could test for more things here, like `Set`s and `Map`s.
+    return className;
+}
+
+function getArrayJsValueFromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    const mem = getDataViewMemory0();
+    const result = [];
+    for (let i = ptr; i < ptr + 4 * len; i += 4) {
+        result.push(wasm.__wbindgen_externrefs.get(mem.getUint32(i, true)));
+    }
+    wasm.__externref_drop_slice(ptr, len);
+    return result;
+}
+
+function getArrayU8FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
+}
+
+let cachedDataViewMemory0 = null;
+function getDataViewMemory0() {
+    if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer.detached === true || (cachedDataViewMemory0.buffer.detached === undefined && cachedDataViewMemory0.buffer !== wasm.memory.buffer)) {
+        cachedDataViewMemory0 = new DataView(wasm.memory.buffer);
+    }
+    return cachedDataViewMemory0;
+}
+
+function getStringFromWasm0(ptr, len) {
+    return decodeText(ptr >>> 0, len);
+}
+
+let cachedUint8ArrayMemory0 = null;
+function getUint8ArrayMemory0() {
+    if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) {
+        cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
+    }
+    return cachedUint8ArrayMemory0;
+}
+
+function handleError(f, args) {
+    try {
+        return f.apply(this, args);
+    } catch (e) {
+        const idx = addToExternrefTable0(e);
+        wasm.__wbindgen_exn_store(idx);
+    }
+}
+
+function isLikeNone(x) {
+    return x === undefined || x === null;
+}
+
+function makeClosure(arg0, arg1, f) {
+    const state = { a: arg0, b: arg1, cnt: 1 };
+    const real = (...args) => {
+
+        // First up with a closure we increment the internal reference
+        // count. This ensures that the Rust closure environment won't
+        // be deallocated while we're invoking it.
+        state.cnt++;
+        try {
+            return f(state.a, state.b, ...args);
+        } finally {
+            real._wbg_cb_unref();
+        }
+    };
+    real._wbg_cb_unref = () => {
+        if (--state.cnt === 0) {
+            wasm.__wbindgen_destroy_closure(state.a, state.b);
+            state.a = 0;
+            CLOSURE_DTORS.unregister(state);
+        }
+    };
+    CLOSURE_DTORS.register(real, state, state);
+    return real;
+}
+
+function makeMutClosure(arg0, arg1, f) {
+    const state = { a: arg0, b: arg1, cnt: 1 };
+    const real = (...args) => {
+
+        // First up with a closure we increment the internal reference
+        // count. This ensures that the Rust closure environment won't
+        // be deallocated while we're invoking it.
+        state.cnt++;
+        const a = state.a;
+        state.a = 0;
+        try {
+            return f(a, state.b, ...args);
+        } finally {
+            state.a = a;
+            real._wbg_cb_unref();
+        }
+    };
+    real._wbg_cb_unref = () => {
+        if (--state.cnt === 0) {
+            wasm.__wbindgen_destroy_closure(state.a, state.b);
+            state.a = 0;
+            CLOSURE_DTORS.unregister(state);
+        }
+    };
+    CLOSURE_DTORS.register(real, state, state);
+    return real;
+}
+
+function passStringToWasm0(arg, malloc, realloc) {
+    if (realloc === undefined) {
+        const buf = cachedTextEncoder.encode(arg);
+        const ptr = malloc(buf.length, 1) >>> 0;
+        getUint8ArrayMemory0().subarray(ptr, ptr + buf.length).set(buf);
+        WASM_VECTOR_LEN = buf.length;
+        return ptr;
+    }
+
+    let len = arg.length;
+    let ptr = malloc(len, 1) >>> 0;
+
+    const mem = getUint8ArrayMemory0();
+
+    let offset = 0;
+
+    for (; offset < len; offset++) {
+        const code = arg.charCodeAt(offset);
+        if (code > 0x7F) break;
+        mem[ptr + offset] = code;
+    }
+    if (offset !== len) {
+        if (offset !== 0) {
+            arg = arg.slice(offset);
+        }
+        ptr = realloc(ptr, len, len = offset + arg.length * 3, 1) >>> 0;
+        const view = getUint8ArrayMemory0().subarray(ptr + offset, ptr + len);
+        const ret = cachedTextEncoder.encodeInto(arg, view);
+
+        offset += ret.written;
+        ptr = realloc(ptr, len, offset, 1) >>> 0;
+    }
+
+    WASM_VECTOR_LEN = offset;
+    return ptr;
+}
+
+function takeFromExternrefTable0(idx) {
+    const value = wasm.__wbindgen_externrefs.get(idx);
+    wasm.__externref_table_dealloc(idx);
+    return value;
+}
+
+let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+cachedTextDecoder.decode();
+const MAX_SAFARI_DECODE_BYTES = 2146435072;
+let numBytesDecoded = 0;
+function decodeText(ptr, len) {
+    numBytesDecoded += len;
+    if (numBytesDecoded >= MAX_SAFARI_DECODE_BYTES) {
+        cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+        cachedTextDecoder.decode();
+        numBytesDecoded = len;
+    }
+    return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
+}
+
+const cachedTextEncoder = new TextEncoder();
+
+if (!('encodeInto' in cachedTextEncoder)) {
+    cachedTextEncoder.encodeInto = function (arg, view) {
+        const buf = cachedTextEncoder.encode(arg);
+        view.set(buf);
+        return {
+            read: arg.length,
+            written: buf.length
+        };
+    };
+}
+
+let WASM_VECTOR_LEN = 0;
+
+let wasmModule, wasmInstance, wasm;
+function __wbg_finalize_init(instance, module) {
+    wasmInstance = instance;
+    wasm = instance.exports;
+    wasmModule = module;
+    cachedDataViewMemory0 = null;
+    cachedUint8ArrayMemory0 = null;
+    wasm.__wbindgen_start();
+    return wasm;
+}
+
+async function __wbg_load(module, imports) {
+    if (typeof Response === 'function' && module instanceof Response) {
+        if (typeof WebAssembly.instantiateStreaming === 'function') {
+            try {
+                return await WebAssembly.instantiateStreaming(module, imports);
+            } catch (e) {
+                const validResponse = module.ok && expectedResponseType(module.type);
+
+                if (validResponse && module.headers.get('Content-Type') !== 'application/wasm') {
+                    console.warn("`WebAssembly.instantiateStreaming` failed because your server does not serve Wasm with `application/wasm` MIME type. Falling back to `WebAssembly.instantiate` which is slower. Original error:\n", e);
+
+                } else { throw e; }
+            }
+        }
+
+        const bytes = await module.arrayBuffer();
+        return await WebAssembly.instantiate(bytes, imports);
+    } else {
+        const instance = await WebAssembly.instantiate(module, imports);
+
+        if (instance instanceof WebAssembly.Instance) {
+            return { instance, module };
+        } else {
+            return instance;
+        }
+    }
+
+    function expectedResponseType(type) {
+        switch (type) {
+            case 'basic': case 'cors': case 'default': return true;
+        }
+        return false;
+    }
+}
+
+function initSync(module) {
+    if (wasm !== undefined) return wasm;
+
+
+    if (module !== undefined) {
+        if (Object.getPrototypeOf(module) === Object.prototype) {
+            ({module} = module)
+        } else {
+            console.warn('using deprecated parameters for `initSync()`; pass a single object instead')
+        }
+    }
+
+    const imports = __wbg_get_imports();
+    if (!(module instanceof WebAssembly.Module)) {
+        module = new WebAssembly.Module(module);
+    }
+    const instance = new WebAssembly.Instance(module, imports);
+    return __wbg_finalize_init(instance, module);
+}
+
+async function __wbg_init(module_or_path) {
+    if (wasm !== undefined) return wasm;
+
+
+    if (module_or_path !== undefined) {
+        if (Object.getPrototypeOf(module_or_path) === Object.prototype) {
+            ({module_or_path} = module_or_path)
+        } else {
+            console.warn('using deprecated parameters for the initialization function; pass a single object instead')
+        }
+    }
+
+    if (module_or_path === undefined) {
+        module_or_path = new URL('vendor/oxigraph_bg.wasm', location.href);
+    }
+    const imports = __wbg_get_imports();
+
+    if (typeof module_or_path === 'string' || (typeof Request === 'function' && module_or_path instanceof Request) || (typeof URL === 'function' && module_or_path instanceof URL)) {
+        module_or_path = fetch(module_or_path);
+    }
+
+    const { instance, module } = await __wbg_load(await module_or_path, imports);
+
+    return __wbg_finalize_init(instance, module);
+}
+
+
+
+window.oxigraph={default:__wbg_init,initSync,BlankNode,DefaultGraph,Literal,NamedNode,Quad,Store,Variable,blankNode,defaultGraph,fromQuad,fromTerm,literal,main,namedNode,parse,quad,triple,variable};
+})();
+</script>
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=n=>Number(n).toLocaleString("es-ES");
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const KGN={"boehringer-ingelheim":"Life Forward (BI)","jardiance":"Jardiance","ofev":"OFEV","enterprise":"Enterprise"};
+const TYPEVAR={Brand:"--ink",Document:"--accent",Section:"--prov",Chunk:"--prov",PISection:"--prov",Table:"--prov",Claim:"--claim",ContentModule:"--claim",Reference:"--claim",ClinicalTrial:"--outcome",CardiovascularOutcome:"--outcome",RenalOutcome:"--outcome",RespiratoryOutcome:"--outcome",Indication:"--domain",Market:"--market",SafetyStatement:"--safety",ToneRule:"--rule",VisualRule:"--rule"};
+const tcol=t=>css(TYPEVAR[t]||"--muted");
+const LONG=["claim_text","reference_text","statement_text","indication_text","outcome_text","rule_text","text"];
+
+let K, N=[], OUT, IN, byId=new Map(), PROPS=new Set();
+let state={kg:"",type:"",q:"",sel:null,limit:100};
+
+fetch("data/kg.json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(init).catch(e=>{$("#loading").textContent="No se pudo cargar data/kg.json ("+e.message+"). Si abres la app desde tu disco, sírvela con un servidor local (ver README).";});
+
+function init(data){
+  K=data;
+  N=K.nodes.map((n,i)=>{const o={i,id:n[0],type:K.types[n[1]],kg:n[2],label:n[3],p:n[4]};
+    o.hay=(o.label+" "+o.id+" "+Object.entries(o.p).filter(([k,v])=>typeof v==="string"&&k!=="source_hash").map(([k,v])=>v).join(" ")).toLowerCase();return o});
+  N.forEach(n=>{byId.set(n.id,n);Object.keys(n.p).forEach(k=>PROPS.add(k))});
+  OUT=N.map(()=>[]);IN=N.map(()=>[]);
+  K.edges.forEach(([s,t,o])=>{OUT[s].push([K.rtypes[t],o]);IN[o].push([K.rtypes[t],s])});
+  $("#loading").hidden=true;
+  buildHome();buildFilters();buildSchema();buildPresets();
+  route();
+}
+
+/* ---------- routing ---------- */
+const VIEWS=["inicio","explorar","sparql","esquema"];
+function route(){let v=location.hash.slice(1);if(!VIEWS.includes(v))v="inicio";
+  document.querySelectorAll("[data-v]").forEach(s=>s.hidden=s.id!=="v-"+v);
+  document.querySelectorAll("nav.views button").forEach(b=>b.setAttribute("aria-selected",b.dataset.view===v));
+  if(v==="explorar")renderList();}
+addEventListener("hashchange",()=>{if(K)route()});
+document.querySelectorAll("nav.views button").forEach(b=>b.onclick=()=>{location.hash=b.dataset.view});
+function go(v){if(location.hash.slice(1)===v)route();else location.hash=v;scrollTo(0,0)}
+
+/* ---------- home ---------- */
+function countBy(f){const m={};N.forEach(n=>{if(f(n)){m[n.type]=(m[n.type]||0)+1}});return Object.entries(m).sort((a,b)=>b[1]-a[1])}
+function buildHome(){
+  const ks=["boehringer-ingelheim","jardiance","ofev"];
+  $("#cards").innerHTML=ks.map(k=>{const c=countBy(n=>n.kg===k);const tot=c.reduce((s,x)=>s+x[1],0);
+    const rel=K.edges.filter(e=>N[e[0]].kg===k).length;
+    return `<div class="card"><div class="eyebrow">${esc(k)}</div><div class="big">${esc(K.graphs[k].name)}</div>
+    <div class="mono" style="color:var(--muted);font-size:12px;margin-bottom:10px">${fmt(tot)} nodos · ${fmt(rel)} relaciones</div>
+    <div class="tchips">${c.map(([t,v])=>`<button class="tchip" data-kg="${k}" data-type="${t}"><i class="dot" style="background:${tcol(t)}"></i>${t} <b>${fmt(v)}</b></button>`).join("")}</div></div>`}).join("");
+  $("#cards").querySelectorAll(".tchip").forEach(b=>b.onclick=()=>openList({kg:b.dataset.kg,type:b.dataset.type,q:""}));
+  const S=[
+    ["Calidad","Claims de eficacia sin seguridad","112 incumplen la regla de la ontología",()=>{go("sparql");loadPreset(0)},true],
+    ["Jardiance","Claims aprobados","Los 129 con claim_status:approved",()=>openList({kg:"jardiance",type:"Claim",q:"claim_status:approved"})],
+    ["Medicina","Ensayos clínicos","EMPEROR-Reduced, EMPA-KIDNEY y los 5 estudios de OFEV",()=>openList({kg:"",type:"ClinicalTrial",q:""})],
+    ["Procedencia","Documentos fuente","Los 16 documentos de las tres marcas",()=>openList({kg:"",type:"Document",q:""})],
+  ];
+  $("#shortcuts").innerHTML=S.map((s,i)=>`<button class="shortcut ${s[4]?"alert":""}" data-i="${i}"><span class="eyebrow">${s[0]}</span><h3>${s[1]}</h3><span style="color:var(--muted);font-size:13px">${s[2]}</span></button>`).join("");
+  $("#shortcuts").querySelectorAll("button").forEach(b=>b.onclick=S[b.dataset.i][3]);
+}
+
+/* ---------- explore ---------- */
+function buildFilters(){
+  $("#fKg").innerHTML=`<option value="">Todos los grafos</option>`+Object.keys(KGN).map(k=>`<option value="${k}">${KGN[k]}</option>`).join("");
+  $("#fType").innerHTML=`<option value="">Todos los tipos</option>`+[...K.types].sort().map(t=>`<option value="${t}">${t}</option>`).join("");
+  $("#fKg").onchange=e=>{state.kg=e.target.value;state.limit=100;renderList()};
+  $("#fType").onchange=e=>{state.type=e.target.value;state.limit=100;renderList()};
+}
+$("#searchForm").addEventListener("submit",e=>{e.preventDefault();openList({q:$("#q").value.trim()})});
+function openList(o){Object.assign(state,o,{limit:100});$("#q").value=state.q;$("#fKg").value=state.kg;$("#fType").value=state.type;go("explorar")}
+function matches(){const q=[...state.q.toLowerCase().matchAll(/([a-z_]+:"[^"]+")|"([^"]+)"|(\S+)/g)].map(m=>(m[1]||m[2]||m[3]).replace(/"/g,""));
+  const test=w=>{const m=w.match(/^([a-z_]+):(.+)$/);if(m&&PROPS.has(m[1]))return n=>String(n.p[m[1]]??"").toLowerCase()===m[2];return n=>n.hay.includes(w)};
+  const tests=q.map(test);
+  return N.filter(n=>(!state.kg||n.kg===state.kg)&&(!state.type||n.type===state.type)&&tests.every(f=>f(n)))}
+function renderList(){
+  const m=matches();
+  $("#count").textContent=`${fmt(m.length)} nodos`+(state.q?` · «${state.q}»`:"");
+  const shown=m.slice(0,state.limit);
+  $("#results").innerHTML=shown.map(n=>`<li><button data-i="${n.i}" aria-current="${state.sel===n.i}"><i class="dot" style="background:${tcol(n.type)}"></i><span class="l">${esc(n.label)}</span><span class="m">${n.type} · ${KGN[n.kg]}</span></button></li>`).join("")+
+    (m.length>shown.length?`<li><button class="more" id="more">Mostrar ${fmt(Math.min(100,m.length-shown.length))} más</button></li>`:"");
+  $("#results").querySelectorAll("button[data-i]").forEach(b=>b.onclick=()=>select(+b.dataset.i));
+  const mb=$("#more");if(mb)mb.onclick=()=>{state.limit+=100;renderList()};
+  if(state.sel===null&&m.length)select(m[0].i,true);
+}
+window.kgOpen=id=>{const n=byId.get(id);if(n){go("explorar");select(n.i)}};
+
+function parentOf(i){
+  for(const [t,o] of OUT[i]) if(t==="DERIVED_FROM_SECTION") return o;
+  for(const [t,s] of IN[i]) if(["SECTION_HAS_CHUNK","DOCUMENT_HAS_SECTION","DOCUMENT_HAS_TABLE","CONTENT_MODULE_CONTAINS_CLAIM","PI_SECTION_CONTAINS_SAFETY"].includes(t)) return s;
+  for(const [t,o] of OUT[i]) if(t==="DERIVED_FROM_TABLE"||t==="DERIVED_FROM_DOCUMENT"||t==="CLAIM_DERIVED_FROM_DOCUMENT") return o;
+  for(const [t,s] of IN[i]) if(t==="BRAND_HAS_DOCUMENT") return s;
+  return null;
+}
+function select(i,quiet){
+  state.sel=i;const n=N[i];
+  document.querySelectorAll("#results button[data-i]").forEach(b=>b.setAttribute("aria-current",+b.dataset.i===i));
+  const chain=[];let p=parentOf(i),guard=0;while(p!==null&&guard++<5&&!chain.includes(p)){chain.unshift(p);p=parentOf(p)}
+  const flags=[];
+  if(n.type==="Claim"&&/efficacy/i.test(n.p.key_message_type||"")&&!OUT[i].some(([t])=>t==="CLAIM_REQUIRES_SAFETY"))flags.push(["crit","Claim de eficacia sin CLAIM_REQUIRES_SAFETY: incumple la regla «Every efficacy claim must carry the required Safety Information»."]);
+  if(n.type==="Claim"&&n.p.claim_status==="candidate")flags.push(["warn","Claim candidato: según la ontología, es solo para revisión y no se puede usar como aprobado."]);
+  if(n.type==="RenalOutcome")flags.push(["crit","Error de extracción: el texto describe la población del estudio, no un resultado renal."]);
+  if((n.type==="ToneRule"||n.type==="VisualRule")&&(n.p.rule_text||"").trim().length<40)flags.push(["warn","El texto de la regla parece un encabezado de sección, no una regla."]);
+  const long=LONG.filter(k=>n.p[k]);const skip=new Set([...long,"data"]);
+  const props=Object.entries(n.p).filter(([k])=>!skip.has(k));
+  let tableHtml="";
+  if(n.p.data&&n.p.data.columns){const d=n.p.data,rows=d.rows.slice(0,300);
+    tableHtml=`<div class="sec"><span class="eyebrow">Tabla · ${fmt(d.rows.length)} filas${d.rows.length>300?" (se muestran 300)":""}</span><div class="scroll"><table><thead><tr>${d.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${(Array.isArray(r)?r:d.columns.map(c=>r[c])).map(v=>`<td>${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`}
+  const grp=(arr)=>{const g={};arr.forEach(([t,o])=>(g[t]=g[t]||[]).push(o));return Object.entries(g)};
+  const relHtml=(arr,dir)=>grp(arr).map(([t,os])=>`<div class="relgroup"><h4>${dir} ${t} <span>(${fmt(os.length)})</span></h4><ul class="rellist">${os.slice(0,40).map(o=>`<li><button data-i="${o}"><i class="dot" style="background:${tcol(N[o].type)}"></i><span class="t">${N[o].type}</span><span class="l">${esc(N[o].label)}</span></button></li>`).join("")}${os.length>40?`<li class="mono" style="color:var(--muted);font-size:12px">… y ${fmt(os.length-40)} más (filtra por tipo o usa SPARQL)</li>`:""}</ul></div>`).join("");
+  $("#record").innerHTML=`
+    <div class="rhead"><span class="eyebrow"><i class="dot" style="background:${tcol(n.type)};margin-right:6px"></i>${n.type} · ${KGN[n.kg]}</span></div>
+    <div class="rtitle">${esc(n.label)}</div>
+    <div class="idline"><span>${esc(n.id)}</span><button class="btn" id="copyId" style="padding:2px 7px">Copiar IRI</button></div>
+    ${chain.length?`<nav class="crumbs" aria-label="Procedencia">${chain.map(c=>`<button data-i="${c}">${esc(N[c].label.length>48?N[c].label.slice(0,46)+"…":N[c].label)}</button><span class="sep">›</span>`).join("")}<span>${esc(n.type)}</span></nav>`:""}
+    ${flags.map(([s,f])=>`<div class="flag ${s==="warn"?"warn":""}">${esc(f)}</div>`).join("")}
+    ${long.map(k=>`<div class="sec"><span class="eyebrow">${k}</span><div class="longtext">${esc(n.p[k])}</div></div>`).join("")}
+    ${tableHtml}
+    <div class="sec"><span class="eyebrow">Propiedades</span><dl class="props">${props.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(typeof v==="object"?JSON.stringify(v):v)}</dd>`).join("")}</dl></div>
+    <div class="sec"><span class="eyebrow">Vecindario · ${fmt(OUT[i].length+IN[i].length)} conexiones</span><div class="neigh" id="neigh"></div></div>
+    <div class="sec"><span class="eyebrow">Relaciones</span>${relHtml(OUT[i],"→")}${relHtml(IN[i],"←")||""}${!OUT[i].length&&!IN[i].length?'<p class="empty">Sin relaciones.</p>':""}</div>`;
+  $("#record").querySelectorAll("button[data-i]").forEach(b=>b.onclick=()=>select(+b.dataset.i));
+  $("#copyId").onclick=()=>copy(n.id,$("#copyId"));
+  drawNeigh(i);
+  if(!quiet&&innerWidth<980)$("#record").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function copy(text,btn){const done=()=>{const o=btn.textContent;btn.textContent="Copiado";setTimeout(()=>btn.textContent=o,1200)};
+  try{navigator.clipboard.writeText(text).then(done,()=>fallbackCopy(text,done))}catch(e){fallbackCopy(text,done)}}
+function fallbackCopy(text,done){const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();try{document.execCommand("copy");done()}catch(e){}t.remove()}
+
+function drawNeigh(i){
+  const el=$("#neigh");if(!window.d3){el.innerHTML='<p class="empty" style="padding:12px">No se pudo cargar la librería de gráficos.</p>';return}
+  const W=el.clientWidth,H=el.clientHeight;
+  let nb=[...OUT[i].map(([t,o])=>({t,o,d:1})),...IN[i].map(([t,o])=>({t,o,d:-1}))];
+  const total=nb.length;
+  // keep variety: at most 8 per relation type, 48 overall
+  const per={};nb=nb.filter(x=>(per[x.t]=(per[x.t]||0)+1)<=8).slice(0,48);
+  const nodes=[{id:i,center:true,fx:0,fy:0},...[...new Set(nb.map(x=>x.o))].filter(o=>o!==i).map(o=>({id:o}))];
+  const links=nb.filter(x=>x.o!==i).map(x=>({source:x.d>0?i:x.o,target:x.d>0?x.o:i,t:x.t}));
+  const svg=d3.select(el).html("").append("svg").attr("viewBox",[-W/2,-H/2,W,H]);
+  const g=svg.append("g");svg.call(d3.zoom().scaleExtent([.4,3]).on("zoom",e=>g.attr("transform",e.transform)));
+  const sim=d3.forceSimulation(nodes).force("link",d3.forceLink(links).id(d=>d.id).distance(90)).force("charge",d3.forceManyBody().strength(-160)).force("col",d3.forceCollide(16)).stop();
+  for(let k=0;k<250;k++)sim.tick();
+  const xs=nodes.map(d=>d.x),ys=nodes.map(d=>d.y),sc=Math.min(1,(W-60)/(Math.max(...xs)-Math.min(...xs)+1),(H-50)/(Math.max(...ys)-Math.min(...ys)+1));
+  g.attr("transform",`scale(${sc})`);
+  g.append("g").selectAll("line").data(links).join("line").attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y).attr("stroke",css("--muted")).attr("stroke-opacity",.5).append("title").text(d=>d.t);
+  const ng=g.append("g").selectAll("g").data(nodes).join("g").attr("transform",d=>`translate(${d.x},${d.y})`).style("cursor",d=>d.center?"default":"pointer").on("click",(e,d)=>{if(!d.center)select(d.id)});
+  ng.append("circle").attr("r",d=>d.center?11:7).attr("fill",d=>tcol(N[d.id].type)).attr("stroke",d=>d.center?css("--ink"):css("--sunk")).attr("stroke-width",d=>d.center?2.5:1.5);
+  ng.append("title").text(d=>N[d.id].type+" · "+N[d.id].label);
+  ng.append("text").attr("dy",d=>d.center?-15:-10).attr("text-anchor","middle").text(d=>{const l=N[d.id].label;return d.center||nodes.length<14?(l.length>26?l.slice(0,24)+"…":l):N[d.id].type});
+  if(total>nb.length)svg.append("text").attr("x",-W/2+10).attr("y",H/2-10).text(`se muestran ${nb.length} de ${total} conexiones`).attr("fill",css("--muted"));
+}
+
+/* ---------- schema ---------- */
+function buildSchema(){
+  const counts={};N.forEach(n=>counts[n.type]=(counts[n.type]||0)+1);
+  const cls=Object.entries(K.classes).sort((a,b)=>(counts[b[0]]||0)-(counts[a[0]]||0)||a[0].localeCompare(b[0]));
+  $("#schema").innerHTML=cls.map(([c,d])=>{const v=counts[c]||0;const def=d.def["boehringer-ingelheim"]||Object.values(d.def)[0];
+    return `<div class="cls ${v?"":"unused"}"><div class="row"><h3>${v?`<button class="tchip" data-type="${c}" style="font-family:var(--display);font-size:15px;border:0;padding:0;background:none"><i class="dot" style="background:${tcol(c)}"></i>${c}</button>`:esc(c)}</h3><span class="mono" style="color:var(--muted);font-size:12px">${v?fmt(v)+" instancias":"sin instancias"}</span></div>
+    <p>${esc(def)}</p>${d.req.length?`<p class="mono" style="font-size:11.5px">obligatorio: ${d.req.map(esc).join(", ")}</p>`:""}</div>`}).join("");
+  $("#schema").querySelectorAll("[data-type]").forEach(b=>b.onclick=()=>openList({kg:"",type:b.dataset.type,q:""}));
+  const rc={};K.edges.forEach(e=>{const t=K.rtypes[e[1]];rc[t]=(rc[t]||0)+1});
+  $("#relTable").innerHTML=`<thead><tr><th>Relación</th><th>Origen</th><th>Destino</th><th style="text-align:right">Aristas</th><th>Descripción</th></tr></thead><tbody>`+
+    Object.entries(K.rels).sort((a,b)=>(rc[b[0]]||0)-(rc[a[0]]||0)).map(([r,d])=>`<tr style="${rc[r]?"":"color:var(--muted)"}"><td class="mono">${r}</td><td>${d.src.join(", ")}</td><td>${d.tgt.join(", ")}</td><td style="text-align:right">${fmt(rc[r]||0)}</td><td>${esc(d.desc)}</td></tr>`).join("")+"</tbody>";
+}
+
+/* ---------- SPARQL ---------- */
+const P="PREFIX kg: <urn:kg:vocab:>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n\n";
+const PRESETS=[
+ ["Claims de eficacia sin información de seguridad","Regla de la ontología incumplida",P+`SELECT ?claim ?estado ?tipo ?texto WHERE {
+  ?claim a kg:Claim ;
+         kg:claim_status ?estado ;
+         kg:key_message_type ?tipo ;
+         kg:claim_text ?texto .
+  FILTER(CONTAINS(LCASE(?tipo), "efficacy"))
+  FILTER NOT EXISTS { ?claim kg:CLAIM_REQUIRES_SAFETY ?s }
+}
+ORDER BY ?estado`],
+ ["Claim → referencia → documento fuente","Trazabilidad completa de cada claim",P+`SELECT ?claim ?estado ?texto ?referencia ?documento ?fila WHERE {
+  ?claim kg:claim_text ?texto ;
+         kg:claim_status ?estado ;
+         kg:row_number ?fila ;
+         kg:CLAIM_SUPPORTED_BY_REFERENCE ?r ;
+         kg:CLAIM_DERIVED_FROM_DOCUMENT ?d .
+  ?r kg:reference_text ?referencia .
+  ?d kg:source_file_name ?documento .
+}
+LIMIT 100`],
+ ["Claims por indicación y estado","Recuento de claims de Jardiance",P+`SELECT ?indicacion ?estado (COUNT(?c) AS ?claims) WHERE {
+  ?c a kg:Claim ; kg:claim_status ?estado .
+  OPTIONAL { ?c kg:indication ?i }
+  BIND(COALESCE(?i, "(sin indicación)") AS ?indicacion)
+}
+GROUP BY ?indicacion ?estado
+ORDER BY DESC(?claims)`],
+ ["Ensayos clínicos y resultados","Resultados enlazados a cada ensayo",P+`SELECT ?ensayo ?nct ?tipoResultado ?resultado WHERE {
+  ?o (kg:OUTCOME_FROM_TRIAL|kg:RENAL_OUTCOME_FROM_TRIAL) ?t .
+  ?t kg:trial_name ?ensayo ; kg:nct_number ?nct .
+  ?o a ?tipoResultado ; kg:outcome_text ?resultado .
+}
+ORDER BY ?ensayo`],
+ ["Safety statements que mencionan un término","Cambia «ketoacidosis» por otro término",P+`SELECT ?s ?documento ?pagina ?texto WHERE {
+  ?s a kg:SafetyStatement ;
+     kg:statement_text ?texto ;
+     kg:source_file_name ?documento ;
+     kg:page_number ?pagina .
+  FILTER(CONTAINS(LCASE(?texto), "ketoacidosis"))
+}
+ORDER BY ?documento ?pagina`],
+ ["Nodos por clase y grafo","Inventario del dataset",P+`SELECT ?grafo ?clase (COUNT(?s) AS ?n) WHERE {
+  GRAPH ?grafo { ?s a ?clase }
+}
+GROUP BY ?grafo ?clase
+ORDER BY ?grafo DESC(?n)`],
+ ["Reglas visuales con contenido real","Reglas de más de 200 caracteres, por marca",P+`SELECT ?grafo ?regla ?documento WHERE {
+  GRAPH ?grafo { ?r a kg:VisualRule ; kg:rule_text ?regla ; kg:source_file_name ?documento }
+  FILTER(STRLEN(?regla) > 200)
+}
+LIMIT 60`],
+ ["Ontología: clases y superclases","Jerarquía OWL reconstruida",P+`SELECT ?clase ?superclase ?definicion WHERE {
+  ?clase a owl:Class ; rdfs:subClassOf ?superclase .
+  FILTER(isIRI(?superclase))
+  OPTIONAL { ?clase skos:definition ?definicion }
+}
+ORDER BY ?superclase ?clase`],
+];
+function buildPresets(){
+  $("#presets").innerHTML=PRESETS.map((p,i)=>`<button data-i="${i}">${esc(p[0])}<small>${esc(p[1])}</small></button>`).join("");
+  $("#presets").querySelectorAll("button").forEach(b=>b.onclick=()=>loadPreset(+b.dataset.i));
+  $("#sq").value=PRESETS[0][2];
+}
+function loadPreset(i){$("#sq").value=PRESETS[i][2];runQuery()}
+let store=null,loadingStore=null,lastRows=null;
+function status(t,err){const s=$("#sqStatus");s.textContent=t;s.className="status"+(err?" err":"")}
+async function getStore(){
+  if(store)return store;
+  if(loadingStore)return loadingStore;
+  loadingStore=(async()=>{
+    if(!window.oxigraph)throw new Error("el motor SPARQL no está disponible en este navegador");
+    status("Cargando el motor SPARQL…");const t0=performance.now();
+    await window.oxigraph.default({module_or_path:"vendor/oxigraph_bg.wasm"});
+    status("Cargando 67.000 tripletas…");
+    const [trig,ont]=await Promise.all([fetch("data/kg.trig").then(r=>r.text()),fetch("data/ontology.ttl").then(r=>r.text())]);
+    const s=new window.oxigraph.Store();
+    s.load(trig,{format:"application/trig"});
+    s.load(ont,{format:"text/turtle",to_graph_name:window.oxigraph.namedNode("urn:kg:vocab:ontology")});
+    store=s;status(`Motor listo · ${fmt(s.size)} tripletas · ${((performance.now()-t0)/1000).toFixed(1)} s`);return s})();
+  try{return await loadingStore}catch(e){loadingStore=null;throw e}
+}
+async function runQuery(){
+  const q=$("#sq").value;$("#run").disabled=true;$("#sqOut").innerHTML="";
+  try{
+    const s=await getStore();status("Ejecutando…");
+    await new Promise(r=>setTimeout(r,20));
+    const t0=performance.now();
+    const res=s.query(q,{use_default_graph_as_union:true});
+    const ms=(performance.now()-t0).toFixed(0);
+    if(typeof res==="boolean"){$("#sqOut").innerHTML=`<p class="mono">ASK → ${res}</p>`;status(`Hecho en ${ms} ms`);return}
+    if(!Array.isArray(res)){$("#sqOut").innerHTML=`<pre class="longtext">${esc(String(res))}</pre>`;status(`Hecho en ${ms} ms`);return}
+    if(res.length&&!(res[0] instanceof Map)){ // CONSTRUCT/DESCRIBE quads
+      lastRows=[["sujeto","predicado","objeto"],...res.map(qd=>[qd.subject.value,qd.predicate.value,qd.object.value])];
+    }else{
+      const vars=[];res.forEach(m=>m.forEach((v,k)=>{if(!vars.includes(k))vars.push(k)}));
+      const vm=q.match(/SELECT\s+(?:DISTINCT\s+|REDUCED\s+)?([\s\S]*?)\s*(?:FROM|WHERE|\{)/i);
+      if(vm){const order=[...vm[1].matchAll(/\?(\w+)/g)].map(x=>x[1]).filter(v=>vars.includes(v));vars.sort((a,b)=>(order.lastIndexOf(a)+1||99)-(order.lastIndexOf(b)+1||99))}
+      lastRows=[vars,...res.map(m=>vars.map(v=>m.get(v)||null))];
+    }
+    renderRows(lastRows);status(`${fmt(lastRows.length-1)} resultados · ${ms} ms`);$("#copyRes").disabled=!(lastRows.length>1);
+  }catch(e){status("Error: "+(e.message||e),true)}
+  finally{$("#run").disabled=false}
+}
+function cell(t){
+  if(t==null)return"";
+  if(typeof t==="string")return esc(t);
+  if(t.termType==="NamedNode"){const n=byId.get(t.value);return n?`<button class="iri" data-id="${esc(t.value)}" title="${esc(t.value)}">${esc(n.label.length>80?n.label.slice(0,78)+"…":n.label)}</button>`:`<span class="mono">${esc(t.value.replace("urn:kg:vocab:","kg:"))}</span>`}
+  const v=t.value;return esc(v.length>400?v.slice(0,398)+"…":v);
+}
+function renderRows(rows){
+  const [h,...b]=rows;const lim=b.slice(0,1000);
+  $("#sqOut").innerHTML=b.length?`<div class="scroll" style="max-height:560px"><table><thead><tr>${h.map(x=>`<th>${esc(x)}</th>`).join("")}</tr></thead><tbody>${lim.map(r=>`<tr>${r.map(c=>`<td>${cell(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>${b.length>1000?`<p class="status">Se muestran 1.000 de ${fmt(b.length)} filas.</p>`:""}`:`<p class="status">Sin resultados.</p>`;
+  $("#sqOut").querySelectorAll("button.iri").forEach(x=>x.onclick=()=>window.kgOpen(x.dataset.id));
+}
+$("#run").onclick=runQuery;
+$("#sq").addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key==="Enter"){e.preventDefault();runQuery()}});
+$("#copyRes").onclick=()=>{if(!lastRows)return;const tsv=lastRows.map(r=>r.map(c=>c==null?"":(typeof c==="string"?c:c.value)).map(v=>String(v).replace(/[\t\n]+/g," ")).join("\t")).join("\n");copy(tsv,$("#copyRes"))};
+})();
+</script>
+
+</body>
+</html>

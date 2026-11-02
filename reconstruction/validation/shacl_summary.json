@@ -1,0 +1,16 @@
+{
+ "boehringer-ingelheim": {
+  "conforms": true,
+  "results": {}
+ },
+ "jardiance": {
+  "conforms": false,
+  "results": {
+   "Efficacy claim has no CLAIM_REQUIRES_SAFETY link (ontology rule: every efficacy claim must carry the required Safety Information)": 112
+  }
+ },
+ "ofev": {
+  "conforms": true,
+  "results": {}
+ }
+}

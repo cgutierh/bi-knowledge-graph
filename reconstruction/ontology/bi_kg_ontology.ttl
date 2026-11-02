@@ -1,0 +1,1155 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix kg: <urn:kg:vocab:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+kg:BRAND_HAS_COMPLIANCE_RULE a owl:ObjectProperty ;
+    rdfs:label "BRAND_HAS_COMPLIANCE_RULE"@en ;
+    rdfs:domain kg:Brand ;
+    rdfs:range kg:ComplianceRule ;
+    skos:definition "A brand has a compliance rule (brand-specific governance)."@en ;
+    skos:scopeNote "The corporate brand is governed by a responsible-AI compliance rule."@en .
+
+kg:BRAND_HAS_DOCUMENT a owl:ObjectProperty ;
+    rdfs:label "BRAND_HAS_DOCUMENT"@en ;
+    rdfs:domain kg:Brand ;
+    rdfs:range kg:Document ;
+    skos:definition "A brand's uploaded source documents."@en .
+
+kg:BRAND_HAS_PRODUCT a owl:ObjectProperty ;
+    rdfs:label "BRAND_HAS_PRODUCT"@en ;
+    rdfs:domain kg:Brand ;
+    rdfs:range kg:Product ;
+    skos:definition "A brand has one or more products."@en .
+
+kg:BRAND_HAS_TONE_RULE a owl:ObjectProperty ;
+    rdfs:label "BRAND_HAS_TONE_RULE"@en ;
+    rdfs:domain kg:Brand ;
+    rdfs:range kg:ToneRule ;
+    skos:definition "A brand has tone rules."@en .
+
+kg:BRAND_HAS_VISUAL_RULE a owl:ObjectProperty ;
+    rdfs:label "BRAND_HAS_VISUAL_RULE"@en ;
+    rdfs:domain kg:Brand ;
+    rdfs:range kg:VisualRule ;
+    skos:definition "A brand has visual rules."@en .
+
+kg:BRAND_TARGETS_MARKET a owl:ObjectProperty ;
+    rdfs:label "BRAND_TARGETS_MARKET"@en ;
+    rdfs:domain kg:Brand ;
+    rdfs:range kg:Market ;
+    skos:definition "A brand targets (is commercialized in) a market."@en .
+
+kg:CLAIM_APPLIES_TO_AUDIENCE a owl:ObjectProperty ;
+    rdfs:label "CLAIM_APPLIES_TO_AUDIENCE"@en ;
+    rdfs:domain kg:Claim ;
+    rdfs:range kg:Audience ;
+    skos:definition "A claim applies to an audience."@en .
+
+kg:CLAIM_DERIVED_FROM_DOCUMENT a owl:ObjectProperty ;
+    rdfs:label "CLAIM_DERIVED_FROM_DOCUMENT"@en ;
+    rdfs:domain kg:Claim ;
+    rdfs:range kg:Document ;
+    rdfs:subPropertyOf kg:DERIVED_FROM_DOCUMENT ;
+    skos:definition "A claim is derived from a source document."@en .
+
+kg:CLAIM_FROM_TRIAL a owl:ObjectProperty ;
+    rdfs:label "CLAIM_FROM_TRIAL"@en ;
+    rdfs:domain kg:Claim ;
+    rdfs:range kg:ClinicalTrial ;
+    skos:definition "A claim is substantiated by a clinical trial."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/jardiance>,
+        <urn:kg:vocab:overlay/ofev> .
+
+kg:CLAIM_REPORTS_OUTCOME a owl:ObjectProperty ;
+    rdfs:label "CLAIM_REPORTS_OUTCOME"@en ;
+    rdfs:domain kg:Claim ;
+    rdfs:range kg:ClinicalOutcome ;
+    skos:definition "A claim reports a cardiovascular outcome."@en ;
+    skos:scopeNote "A claim reports a respiratory outcome."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/jardiance>,
+        <urn:kg:vocab:overlay/ofev> .
+
+kg:CLAIM_REPORTS_RENAL_OUTCOME a owl:ObjectProperty ;
+    rdfs:label "CLAIM_REPORTS_RENAL_OUTCOME"@en ;
+    rdfs:domain kg:Claim ;
+    rdfs:range kg:RenalOutcome ;
+    skos:definition "A claim reports a renal outcome."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/jardiance> .
+
+kg:CLAIM_REQUIRES_SAFETY a owl:ObjectProperty ;
+    rdfs:label "CLAIM_REQUIRES_SAFETY"@en ;
+    rdfs:domain kg:Claim ;
+    rdfs:range kg:SafetyStatement ;
+    skos:definition "A claim requires accompanying safety information."@en .
+
+kg:CLAIM_SUPPORTED_BY_REFERENCE a owl:ObjectProperty ;
+    rdfs:label "CLAIM_SUPPORTED_BY_REFERENCE"@en ;
+    rdfs:domain kg:Claim ;
+    rdfs:range kg:Reference ;
+    skos:definition "A claim is supported by a reference."@en .
+
+kg:CLAIM_VALID_FOR_CHANNEL a owl:ObjectProperty ;
+    rdfs:label "CLAIM_VALID_FOR_CHANNEL"@en ;
+    rdfs:domain kg:Claim ;
+    rdfs:range kg:Channel ;
+    skos:definition "A claim is valid for a channel."@en .
+
+kg:COMPLIANCE_RULE_APPLIES_TO_ASSET_TYPE a owl:ObjectProperty ;
+    rdfs:label "COMPLIANCE_RULE_APPLIES_TO_ASSET_TYPE"@en ;
+    rdfs:domain kg:ComplianceRule ;
+    rdfs:range kg:AssetType ;
+    skos:definition "A compliance rule applies to an asset type."@en .
+
+kg:COMPLIANCE_RULE_DERIVED_FROM_FRAMEWORK a owl:ObjectProperty ;
+    rdfs:label "COMPLIANCE_RULE_DERIVED_FROM_FRAMEWORK"@en ;
+    rdfs:domain kg:ComplianceRule ;
+    rdfs:range kg:RegulatoryFramework ;
+    skos:definition "A compliance rule is derived from a regulatory framework."@en .
+
+kg:COMPLIANCE_RULE_OVERRIDES a owl:ObjectProperty ;
+    rdfs:label "COMPLIANCE_RULE_OVERRIDES"@en ;
+    rdfs:domain kg:ComplianceRule ;
+    rdfs:range kg:ComplianceRule ;
+    skos:definition "A brand-specific compliance rule overrides/extends a shared (e.g. corporate-baseline) compliance rule."@en .
+
+kg:CONTENT_MODULE_CONTAINS_CLAIM a owl:ObjectProperty ;
+    rdfs:label "CONTENT_MODULE_CONTAINS_CLAIM"@en ;
+    rdfs:domain kg:ContentModule ;
+    rdfs:range kg:Claim ;
+    rdfs:subPropertyOf dcterms:hasPart ;
+    skos:definition "A content module contains one or more claims."@en .
+
+kg:CardiovascularOutcome a owl:Class ;
+    rdfs:label "CardiovascularOutcome"@en ;
+    rdfs:subClassOf kg:ClinicalOutcome ;
+    skos:definition "A cardiovascular outcome reported for Jardiance (e.g. CV death, hospitalisation for heart failure), measured in a clinical trial."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/jardiance> ;
+    kg:optionalField "hazard_ratio",
+        "p_value",
+        "relative_risk_reduction",
+        "source_page",
+        "trial_name" ;
+    kg:requiredField "outcome_text",
+        "source_document_id" .
+
+kg:DERIVED_FROM_SECTION a owl:ObjectProperty ;
+    rdfs:label "DERIVED_FROM_SECTION"@en ;
+    rdfs:domain kg:DomainEntity ;
+    rdfs:range kg:Section ;
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    skos:definition "The document section a domain entity was extracted from (from its section_id); the section carries the page number."@en .
+
+kg:DERIVED_FROM_TABLE a owl:ObjectProperty ;
+    rdfs:label "DERIVED_FROM_TABLE"@en ;
+    rdfs:domain kg:DomainEntity ;
+    rdfs:range kg:Table ;
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    skos:definition "The extracted table (e.g. a claims spreadsheet) a domain entity was read from (from its table_id); row_number locates the row."@en .
+
+kg:DOCUMENT_HAS_SECTION a owl:ObjectProperty ;
+    rdfs:label "DOCUMENT_HAS_SECTION"@en ;
+    rdfs:domain kg:Document ;
+    rdfs:range kg:Section ;
+    rdfs:subPropertyOf dcterms:hasPart ;
+    skos:definition "A document's segmented sections."@en .
+
+kg:DOCUMENT_HAS_TABLE a owl:ObjectProperty ;
+    rdfs:label "DOCUMENT_HAS_TABLE"@en ;
+    rdfs:domain kg:Document ;
+    rdfs:range kg:Table ;
+    rdfs:subPropertyOf dcterms:hasPart ;
+    skos:definition "A document's extracted tables."@en .
+
+kg:GUARDRAIL_RULE_APPLIES_TO_ASSET_TYPE a owl:ObjectProperty ;
+    rdfs:label "GUARDRAIL_RULE_APPLIES_TO_ASSET_TYPE"@en ;
+    rdfs:domain kg:GuardrailRule ;
+    rdfs:range kg:AssetType ;
+    skos:definition "A guardrail rule applies to an asset type."@en .
+
+kg:GUARDRAIL_RULE_APPLIES_TO_SERVICE_LINE a owl:ObjectProperty ;
+    rdfs:label "GUARDRAIL_RULE_APPLIES_TO_SERVICE_LINE"@en ;
+    rdfs:domain kg:GuardrailRule ;
+    rdfs:range kg:ServiceLine ;
+    skos:definition "A guardrail rule applies to a service line."@en .
+
+kg:ILLUSTRATION_FOLLOWS_VISUAL_RULE a owl:ObjectProperty ;
+    rdfs:label "ILLUSTRATION_FOLLOWS_VISUAL_RULE"@en ;
+    rdfs:domain kg:SceneIllustration ;
+    rdfs:range kg:VisualRule ;
+    skos:definition "A scene illustration is governed by a visual rule."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/boehringer-ingelheim> .
+
+kg:ILLUSTRATION_FROM_REFERENCE a owl:ObjectProperty ;
+    rdfs:label "ILLUSTRATION_FROM_REFERENCE"@en ;
+    rdfs:domain kg:SceneIllustration ;
+    rdfs:range kg:ReferenceInput ;
+    skos:definition "A scene illustration's character styling was directed by a non-identifying reference input."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/boehringer-ingelheim> .
+
+kg:ILLUSTRATION_HAS_COLOR_VARIANT a owl:ObjectProperty ;
+    rdfs:label "ILLUSTRATION_HAS_COLOR_VARIANT"@en ;
+    rdfs:domain kg:SceneIllustration ;
+    rdfs:range kg:ColorVariant ;
+    skos:definition "A scene illustration ships in a predefined colour variant."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/boehringer-ingelheim> .
+
+kg:MARKET_PART_OF_REGION a owl:ObjectProperty ;
+    rdfs:label "MARKET_PART_OF_REGION"@en ;
+    rdfs:domain kg:Market ;
+    rdfs:range kg:Market ;
+    rdfs:subPropertyOf dcterms:isPartOf ;
+    skos:definition "A market (country) is part of a region (e.g. ASKAN, MIDI, RCV)."@en .
+
+kg:OUTCOME_FROM_TRIAL a owl:ObjectProperty ;
+    rdfs:label "OUTCOME_FROM_TRIAL"@en ;
+    rdfs:domain kg:ClinicalOutcome ;
+    rdfs:range kg:ClinicalTrial ;
+    skos:definition "A cardiovascular outcome was measured in a clinical trial."@en ;
+    skos:scopeNote "A respiratory outcome was measured in a clinical trial."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/jardiance>,
+        <urn:kg:vocab:overlay/ofev> .
+
+kg:PI_SECTION_CONTAINS_SAFETY a owl:ObjectProperty ;
+    rdfs:label "PI_SECTION_CONTAINS_SAFETY"@en ;
+    rdfs:domain kg:PISection ;
+    rdfs:range kg:SafetyStatement ;
+    rdfs:subPropertyOf dcterms:hasPart ;
+    skos:definition "A PI section contains safety statements."@en .
+
+kg:PRODUCT_HAS_INDICATION a owl:ObjectProperty ;
+    rdfs:label "PRODUCT_HAS_INDICATION"@en ;
+    rdfs:domain kg:Product ;
+    rdfs:range kg:Indication ;
+    skos:definition "A product has one or more indications."@en .
+
+kg:Persona a owl:Class ;
+    rdfs:label "Persona"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A specific persona within an audience."@en ;
+    kg:optionalField "attributes",
+        "audience",
+        "description" ;
+    kg:requiredField "name" .
+
+kg:QUALITY_CRITERION_APPLIES_TO_SERVICE_LINE a owl:ObjectProperty ;
+    rdfs:label "QUALITY_CRITERION_APPLIES_TO_SERVICE_LINE"@en ;
+    rdfs:domain kg:QualityCriterion ;
+    rdfs:range kg:ServiceLine ;
+    skos:definition "A quality criterion is used to evaluate a service line's output."@en .
+
+kg:RENAL_OUTCOME_FROM_TRIAL a owl:ObjectProperty ;
+    rdfs:label "RENAL_OUTCOME_FROM_TRIAL"@en ;
+    rdfs:domain kg:RenalOutcome ;
+    rdfs:range kg:ClinicalTrial ;
+    skos:definition "A renal outcome was measured in a clinical trial."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/jardiance> .
+
+kg:RULE_APPLIES_TO_CHANNEL a owl:ObjectProperty ;
+    rdfs:label "RULE_APPLIES_TO_CHANNEL"@en ;
+    rdfs:domain kg:ComplianceRule ;
+    rdfs:range kg:Channel ;
+    skos:definition "A rule applies to a channel."@en .
+
+kg:RULE_APPLIES_TO_MARKET a owl:ObjectProperty ;
+    rdfs:label "RULE_APPLIES_TO_MARKET"@en ;
+    rdfs:domain kg:ComplianceRule ;
+    rdfs:range kg:Market ;
+    skos:definition "A rule applies to a market."@en .
+
+kg:RespiratoryOutcome a owl:Class ;
+    rdfs:label "RespiratoryOutcome"@en ;
+    rdfs:subClassOf kg:ClinicalOutcome ;
+    skos:definition "A pulmonary outcome reported for OFEV (e.g. annual rate of decline in forced vital capacity [FVC], or acute IPF exacerbations), measured in a trial."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/ofev> ;
+    kg:optionalField "confidence_interval",
+        "p_value",
+        "relative_reduction",
+        "source_page",
+        "trial_name" ;
+    kg:requiredField "outcome_text",
+        "source_document_id" .
+
+kg:SECTION_HAS_CHUNK a owl:ObjectProperty ;
+    rdfs:label "SECTION_HAS_CHUNK"@en ;
+    rdfs:domain kg:Section ;
+    rdfs:range kg:Chunk ;
+    rdfs:subPropertyOf dcterms:hasPart ;
+    skos:definition "A section's retrievable chunks."@en .
+
+kg:SERVICE_LINE_HAS_ASSET_TYPE a owl:ObjectProperty ;
+    rdfs:label "SERVICE_LINE_HAS_ASSET_TYPE"@en ;
+    rdfs:domain kg:ServiceLine ;
+    rdfs:range kg:AssetType ;
+    skos:definition "A service line produces one or more asset types."@en .
+
+kg:active_ingredient a owl:DatatypeProperty ;
+    rdfs:label "active_ingredient"@en ;
+    rdfs:range xsd:string .
+
+kg:age_range a owl:DatatypeProperty ;
+    rdfs:label "age_range"@en ;
+    rdfs:range xsd:string .
+
+kg:allowedSourceDocumentType a owl:AnnotationProperty ;
+    rdfs:label "allowed source document type"@en .
+
+kg:appearance_notes a owl:DatatypeProperty ;
+    rdfs:label "appearance_notes"@en ;
+    rdfs:range xsd:string .
+
+kg:applicability a owl:DatatypeProperty ;
+    rdfs:label "applicability"@en ;
+    rdfs:range xsd:string .
+
+kg:approval_status a owl:DatatypeProperty ;
+    rdfs:label "approval_status"@en ;
+    rdfs:range xsd:string .
+
+kg:asset_type a owl:DatatypeProperty ;
+    rdfs:label "asset_type"@en ;
+    rdfs:range xsd:string .
+
+kg:attire a owl:DatatypeProperty ;
+    rdfs:label "attire"@en ;
+    rdfs:range xsd:string .
+
+kg:attributes a owl:DatatypeProperty ;
+    rdfs:label "attributes"@en ;
+    rdfs:range xsd:string .
+
+kg:audience a owl:DatatypeProperty ;
+    rdfs:label "audience"@en ;
+    rdfs:range xsd:string .
+
+kg:background_color a owl:DatatypeProperty ;
+    rdfs:label "background_color"@en ;
+    rdfs:range xsd:string .
+
+kg:brand a owl:DatatypeProperty ;
+    rdfs:label "brand"@en ;
+    rdfs:range xsd:string .
+
+kg:brand_id a owl:DatatypeProperty ;
+    rdfs:label "brand_id"@en ;
+    rdfs:range xsd:string .
+
+kg:canvas a owl:DatatypeProperty ;
+    rdfs:label "canvas"@en ;
+    rdfs:range xsd:string .
+
+kg:category a owl:DatatypeProperty ;
+    rdfs:label "category"@en ;
+    rdfs:range xsd:string .
+
+kg:channel a owl:DatatypeProperty ;
+    rdfs:label "channel"@en ;
+    rdfs:range xsd:string .
+
+kg:chunk_id a owl:DatatypeProperty ;
+    rdfs:label "chunk_id"@en ;
+    rdfs:range xsd:string .
+
+kg:chunk_index a owl:DatatypeProperty ;
+    rdfs:label "chunk_index"@en ;
+    rdfs:range xsd:integer .
+
+kg:claim_status a owl:DatatypeProperty ;
+    rdfs:label "claim_status"@en ;
+    rdfs:range xsd:string .
+
+kg:claim_text a owl:DatatypeProperty ;
+    rdfs:label "claim_text"@en ;
+    rdfs:range xsd:string .
+
+kg:code a owl:DatatypeProperty ;
+    rdfs:label "code"@en ;
+    rdfs:range xsd:string .
+
+kg:color_mode a owl:DatatypeProperty ;
+    rdfs:label "color_mode"@en ;
+    rdfs:range xsd:string .
+
+kg:confidence_interval a owl:DatatypeProperty ;
+    rdfs:label "confidence_interval"@en ;
+    rdfs:range xsd:string .
+
+kg:cultural_context a owl:DatatypeProperty ;
+    rdfs:label "cultural_context"@en ;
+    rdfs:range xsd:string .
+
+kg:data a owl:DatatypeProperty ;
+    rdfs:label "data"@en ;
+    rdfs:range rdf:JSON .
+
+kg:decision a owl:DatatypeProperty ;
+    rdfs:label "decision"@en ;
+    rdfs:range xsd:string .
+
+kg:declaredInOverlay a owl:AnnotationProperty ;
+    rdfs:label "declared in overlay"@en .
+
+kg:description a owl:DatatypeProperty ;
+    rdfs:label "description"@en ;
+    rdfs:range xsd:string .
+
+kg:design a owl:DatatypeProperty ;
+    rdfs:label "design"@en ;
+    rdfs:range xsd:string .
+
+kg:dosage_forms a owl:DatatypeProperty ;
+    rdfs:label "dosage_forms"@en ;
+    rdfs:range xsd:string .
+
+kg:extraction_method a owl:DatatypeProperty ;
+    rdfs:label "extraction_method"@en ;
+    rdfs:range xsd:string .
+
+kg:file_name a owl:DatatypeProperty ;
+    rdfs:label "file_name"@en ;
+    rdfs:range xsd:string .
+
+kg:format a owl:DatatypeProperty ;
+    rdfs:label "format"@en ;
+    rdfs:range xsd:string .
+
+kg:graphScope a owl:DatatypeProperty ;
+    rdfs:label "graphScope"@en ;
+    rdfs:range xsd:string .
+
+kg:hair_details a owl:DatatypeProperty ;
+    rdfs:label "hair_details"@en ;
+    rdfs:range xsd:string .
+
+kg:hazard_ratio a owl:DatatypeProperty ;
+    rdfs:label "hazard_ratio"@en ;
+    rdfs:range xsd:string .
+
+kg:hex_palette a owl:DatatypeProperty ;
+    rdfs:label "hex_palette"@en ;
+    rdfs:range xsd:string .
+
+kg:indication a owl:DatatypeProperty ;
+    rdfs:label "indication"@en ;
+    rdfs:range xsd:string .
+
+kg:indication_text a owl:DatatypeProperty ;
+    rdfs:label "indication_text"@en ;
+    rdfs:range xsd:string .
+
+kg:key_message_type a owl:DatatypeProperty ;
+    rdfs:label "key_message_type"@en ;
+    rdfs:range xsd:string .
+
+kg:last_update a owl:DatatypeProperty ;
+    rdfs:label "last_update"@en ;
+    rdfs:range xsd:string .
+
+kg:line_of_therapy a owl:DatatypeProperty ;
+    rdfs:label "line_of_therapy"@en ;
+    rdfs:range xsd:string .
+
+kg:locatorSourceKind a owl:AnnotationProperty ;
+    rdfs:label "locator source kind"@en .
+
+kg:market a owl:DatatypeProperty ;
+    rdfs:label "market"@en ;
+    rdfs:range xsd:string .
+
+kg:market_scope a owl:DatatypeProperty ;
+    rdfs:label "market_scope"@en ;
+    rdfs:range xsd:string .
+
+kg:mlr_required a owl:DatatypeProperty ;
+    rdfs:label "mlr_required"@en ;
+    rdfs:range xsd:string .
+
+kg:module_name a owl:DatatypeProperty ;
+    rdfs:label "module_name"@en ;
+    rdfs:range xsd:string .
+
+kg:module_text a owl:DatatypeProperty ;
+    rdfs:label "module_text"@en ;
+    rdfs:range xsd:string .
+
+kg:module_type a owl:DatatypeProperty ;
+    rdfs:label "module_type"@en ;
+    rdfs:range xsd:string .
+
+kg:name a owl:DatatypeProperty ;
+    rdfs:label "name"@en ;
+    rdfs:range xsd:string .
+
+kg:nct_number a owl:DatatypeProperty ;
+    rdfs:label "nct_number"@en ;
+    rdfs:range xsd:string .
+
+kg:official_link a owl:DatatypeProperty ;
+    rdfs:label "official_link"@en ;
+    rdfs:range xsd:string .
+
+kg:ontology a owl:Ontology ;
+    rdfs:label "BI Knowledge Graph Ontology (reconstructed from JSON export)"@en ;
+    dcterms:source "ontology/boehringer-ingelheim.ontology.jsonld",
+        "ontology/jardiance.ontology.jsonld",
+        "ontology/ofev.ontology.jsonld" ;
+    rdfs:comment "OWL/RDFS rendering of the three ontology overlays (boehringer-ingelheim / 'Life Forward', jardiance, ofev). Term IRIs keep the original urn:kg:vocab: namespace so the original JSON-LD data stays compatible."@en ;
+    owl:versionInfo "boehringer-ingelheim: generatedAt 2026-09-29T20:24:38.053767+00:00",
+        "jardiance: generatedAt 2026-09-29T20:24:31.620301+00:00",
+        "ofev: generatedAt 2026-09-29T20:24:43.910719+00:00" ;
+    kg:locatorSourceKind "paged: The entity was extracted from a paged document (e.g. a PDF); the locator property is its page number."@en,
+        "tabular: The entity was read from an extracted table (it carries table_id, e.g. a claims spreadsheet row); the locator property is its row number."@en .
+
+kg:ontologyModule a owl:AnnotationProperty ;
+    rdfs:label "ontology module"@en .
+
+kg:optionalField a owl:AnnotationProperty ;
+    rdfs:label "optional field"@en .
+
+kg:outcome_text a owl:DatatypeProperty ;
+    rdfs:label "outcome_text"@en ;
+    rdfs:range xsd:string .
+
+kg:p_value a owl:DatatypeProperty ;
+    rdfs:label "p_value"@en ;
+    rdfs:range xsd:string .
+
+kg:page_number a owl:DatatypeProperty ;
+    rdfs:label "page_number"@en ;
+    rdfs:range xsd:integer .
+
+kg:population a owl:DatatypeProperty ;
+    rdfs:label "population"@en ;
+    rdfs:range xsd:string .
+
+kg:primary_outcome a owl:DatatypeProperty ;
+    rdfs:label "primary_outcome"@en ;
+    rdfs:range xsd:string .
+
+kg:product a owl:DatatypeProperty ;
+    rdfs:label "product"@en ;
+    rdfs:range xsd:string .
+
+kg:reference_text a owl:DatatypeProperty ;
+    rdfs:label "reference_text"@en ;
+    rdfs:range xsd:string .
+
+kg:reference_type a owl:DatatypeProperty ;
+    rdfs:label "reference_type"@en ;
+    rdfs:range xsd:string .
+
+kg:region a owl:DatatypeProperty ;
+    rdfs:label "region"@en ;
+    rdfs:range xsd:string .
+
+kg:regulatory_framework a owl:DatatypeProperty ;
+    rdfs:label "regulatory_framework"@en ;
+    rdfs:range xsd:string .
+
+kg:relative_reduction a owl:DatatypeProperty ;
+    rdfs:label "relative_reduction"@en ;
+    rdfs:range xsd:string .
+
+kg:relative_risk_reduction a owl:DatatypeProperty ;
+    rdfs:label "relative_risk_reduction"@en ;
+    rdfs:range xsd:string .
+
+kg:requiredField a owl:AnnotationProperty ;
+    rdfs:label "required field"@en .
+
+kg:row_number a owl:DatatypeProperty ;
+    rdfs:label "row_number"@en ;
+    rdfs:range xsd:integer .
+
+kg:rule_name a owl:DatatypeProperty ;
+    rdfs:label "rule_name"@en ;
+    rdfs:range xsd:string .
+
+kg:rule_text a owl:DatatypeProperty ;
+    rdfs:label "rule_text"@en ;
+    rdfs:range xsd:string .
+
+kg:rule_type a owl:DatatypeProperty ;
+    rdfs:label "rule_type"@en ;
+    rdfs:range xsd:string .
+
+kg:safety_type a owl:DatatypeProperty ;
+    rdfs:label "safety_type"@en ;
+    rdfs:range xsd:string .
+
+kg:scene_description a owl:DatatypeProperty ;
+    rdfs:label "scene_description"@en ;
+    rdfs:range xsd:string .
+
+kg:scene_type a owl:DatatypeProperty ;
+    rdfs:label "scene_type"@en ;
+    rdfs:range xsd:string .
+
+kg:scope a owl:DatatypeProperty ;
+    rdfs:label "scope"@en ;
+    rdfs:range xsd:string .
+
+kg:section_id a owl:DatatypeProperty ;
+    rdfs:label "section_id"@en ;
+    rdfs:range xsd:string .
+
+kg:section_number a owl:DatatypeProperty ;
+    rdfs:label "section_number"@en ;
+    rdfs:range xsd:string .
+
+kg:section_title a owl:DatatypeProperty ;
+    rdfs:label "section_title"@en ;
+    rdfs:range xsd:string .
+
+kg:section_type a owl:DatatypeProperty ;
+    rdfs:label "section_type"@en ;
+    rdfs:range xsd:string .
+
+kg:service_line a owl:DatatypeProperty ;
+    rdfs:label "service_line"@en ;
+    rdfs:range xsd:string .
+
+kg:severity a owl:DatatypeProperty ;
+    rdfs:label "severity"@en ;
+    rdfs:range xsd:string .
+
+kg:sheet_name a owl:DatatypeProperty ;
+    rdfs:label "sheet_name"@en ;
+    rdfs:range xsd:string .
+
+kg:source_document_id a owl:DatatypeProperty ;
+    rdfs:label "source_document_id"@en ;
+    rdfs:range xsd:string .
+
+kg:source_document_type a owl:DatatypeProperty ;
+    rdfs:label "source_document_type"@en ;
+    rdfs:range xsd:string .
+
+kg:source_file_name a owl:DatatypeProperty ;
+    rdfs:label "source_file_name"@en ;
+    rdfs:range xsd:string .
+
+kg:source_hash a owl:DatatypeProperty ;
+    rdfs:label "source_hash"@en ;
+    rdfs:range xsd:string .
+
+kg:source_page a owl:DatatypeProperty ;
+    rdfs:label "source_page"@en ;
+    rdfs:range xsd:integer .
+
+kg:source_status a owl:DatatypeProperty ;
+    rdfs:label "source_status"@en ;
+    rdfs:range xsd:string .
+
+kg:statement_text a owl:DatatypeProperty ;
+    rdfs:label "statement_text"@en ;
+    rdfs:range xsd:string .
+
+kg:status a owl:DatatypeProperty ;
+    rdfs:label "status"@en ;
+    rdfs:range xsd:string .
+
+kg:stroke a owl:DatatypeProperty ;
+    rdfs:label "stroke"@en ;
+    rdfs:range xsd:string .
+
+kg:subject_type a owl:DatatypeProperty ;
+    rdfs:label "subject_type"@en ;
+    rdfs:range xsd:string .
+
+kg:table_id a owl:DatatypeProperty ;
+    rdfs:label "table_id"@en ;
+    rdfs:range xsd:string .
+
+kg:table_index a owl:DatatypeProperty ;
+    rdfs:label "table_index"@en ;
+    rdfs:range xsd:integer .
+
+kg:technical_mechanism a owl:DatatypeProperty ;
+    rdfs:label "technical_mechanism"@en ;
+    rdfs:range xsd:string .
+
+kg:text a owl:DatatypeProperty ;
+    rdfs:label "text"@en ;
+    rdfs:range xsd:string .
+
+kg:therapeutic_area a owl:DatatypeProperty ;
+    rdfs:label "therapeutic_area"@en ;
+    rdfs:range xsd:string .
+
+kg:token_count a owl:DatatypeProperty ;
+    rdfs:label "token_count"@en ;
+    rdfs:range xsd:integer .
+
+kg:trial_name a owl:DatatypeProperty ;
+    rdfs:label "trial_name"@en ;
+    rdfs:range xsd:string .
+
+kg:url a owl:DatatypeProperty ;
+    rdfs:label "url"@en ;
+    rdfs:range xsd:string .
+
+kg:validationRule a owl:AnnotationProperty ;
+    rdfs:label "validation rule"@en .
+
+kg:Audience a owl:Class ;
+    rdfs:label "Audience"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A target audience (e.g. HCP, Patient, Caregiver, Payer)."@en ;
+    kg:optionalField "description" ;
+    kg:requiredField "name" .
+
+kg:Chunk a owl:Class ;
+    rdfs:label "Chunk"@en ;
+    rdfs:subClassOf kg:ProvenanceEntity ;
+    skos:definition "A retrievable, token-sized slice of a section's text, with full source lineage."@en ;
+    kg:optionalField "chunk_index",
+        "extraction_method",
+        "page_number",
+        "source_hash",
+        "text",
+        "token_count" ;
+    kg:requiredField "chunk_id",
+        "source_document_id" .
+
+kg:ColorVariant a owl:Class ;
+    rdfs:label "ColorVariant"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "One of the five predefined, switchable colour variants of a scene illustration (blue, gray, red, violet, yellow), shipped as a layer."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/boehringer-ingelheim> ;
+    kg:optionalField "background_color",
+        "file_name",
+        "hex_palette" ;
+    kg:requiredField "color_mode" .
+
+kg:ContentModule a owl:Class ;
+    rdfs:label "ContentModule"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A toolkit-aligned, editable illustration module / scene asset assembled for reuse, with separated stroke and fill layers and switchable colour variants."@en ;
+    skos:scopeNote "[jardiance] Modular approved content assembled into assets."@en,
+        "[ofev] Modular approved content assembled into assets."@en ;
+    kg:allowedSourceDocumentType "claims_content_modules",
+        "guidance_document",
+        "service_catalogue" ;
+    kg:optionalField "approval_status",
+        "audience",
+        "channel",
+        "market",
+        "module_text",
+        "module_type",
+        "source_page" ;
+    kg:requiredField "module_name",
+        "source_document_id" .
+
+kg:DERIVED_FROM_DOCUMENT a owl:ObjectProperty ;
+    rdfs:label "DERIVED_FROM_DOCUMENT"@en ;
+    rdfs:domain kg:DomainEntity ;
+    rdfs:range kg:Document ;
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    skos:definition "The source document a domain entity was extracted from (from its source_document_id)."@en .
+
+kg:Indication a owl:Class ;
+    rdfs:label "Indication"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "An approved therapeutic use."@en ;
+    kg:optionalField "line_of_therapy",
+        "population" ;
+    kg:requiredField "indication_text",
+        "market",
+        "source_document_id" .
+
+kg:PISection a owl:Class ;
+    rdfs:label "PISection"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A prescribing-information section."@en ;
+    kg:allowedSourceDocumentType "prescribing_information",
+        "product_information" ;
+    kg:optionalField "section_number",
+        "section_title",
+        "text" ;
+    kg:requiredField "source_document_id" .
+
+kg:QualityCriterion a owl:Class ;
+    rdfs:label "QualityCriterion"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A standardized dimension used to evaluate content quality across service lines (e.g. linguistic accuracy, brand alignment)."@en ;
+    kg:optionalField "description" ;
+    kg:requiredField "name" .
+
+kg:Reference a owl:Class ;
+    rdfs:label "Reference"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A supporting study, publication, trial, or label section."@en ;
+    kg:optionalField "reference_type",
+        "row_number",
+        "source_page",
+        "url" ;
+    kg:requiredField "reference_text",
+        "source_document_id" .
+
+kg:ReferenceInput a owl:Class ;
+    rdfs:label "ReferenceInput"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A non-identifying appearance/styling reference for a character. Used only to define appearance direction and styling cues — never used for generation and never a real person's likeness."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/boehringer-ingelheim> ;
+    kg:optionalField "age_range",
+        "attire",
+        "cultural_context",
+        "hair_details",
+        "source_page" ;
+    kg:requiredField "appearance_notes" .
+
+kg:RegulatoryFramework a owl:Class ;
+    rdfs:label "RegulatoryFramework"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A named law, regulation, or industry code governing AI disclosure, advertising, or data protection (e.g. EU AI Act, ABPI Code, GDPR)."@en ;
+    kg:optionalField "description",
+        "last_update",
+        "official_link",
+        "source_page" ;
+    kg:requiredField "name",
+        "scope",
+        "source_document_id" .
+
+kg:ToneRule a owl:Class ;
+    rdfs:label "ToneRule"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "Boehringer Ingelheim corporate voice for AI-generated creative — aligned to the corporate brand and the \"Life forward\" tagline."@en ;
+    skos:scopeNote "[jardiance] Jardiance brand voice — a motivational coach: optimistic, proactive, brave, energizing and confident."@en,
+        "[ofev] OFEV brand voice and personality — Protective, Reliable, High-performance, Encouraging and, together, Indispensable."@en ;
+    kg:allowedSourceDocumentType "brand_book",
+        "guidance_document" ;
+    kg:optionalField "applicability",
+        "source_page" ;
+    kg:requiredField "rule_text",
+        "source_document_id" ;
+    kg:validationRule "[boehringer-ingelheim] Creative must stay consistent with the BI design style guide and the brand-hub approved look and feel."@en,
+        "[boehringer-ingelheim] Express the Boehringer Ingelheim corporate identity; the corporate tagline is 'Life forward'."@en,
+        "[boehringer-ingelheim] These evaluation / toolkit materials are classified for internal use only."@en,
+        "[jardiance] Never aggressive, frenetic, excessive, exhausting, short-sighted or focused on instant wins."@en,
+        "[jardiance] Prefer present/future tense for momentum — except where Claim/SafetyStatement require past tense (EU CV claims; EU/Mexico safety)."@en,
+        "[jardiance] Voice is optimistic, proactive, brave, energizing and confident."@en,
+        "[ofev] Disease-state (unbranded) communications convey IPF's urgency and unpredictability ('patients are walking on unstable ground')."@en,
+        "[ofev] Personality: protective, reliable, high-performance and encouraging — together, indispensable."@en,
+        "[ofev] Voice is confident, vigilant and motivating; the HCP campaign rallies around 'Change the path of IPF'."@en .
+
+kg:Channel a owl:Class ;
+    rdfs:label "Channel"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A delivery channel (e.g. Email, Website, Banner, IVA, Social)."@en ;
+    kg:optionalField "description",
+        "format" ;
+    kg:requiredField "name" .
+
+kg:GuardrailRule a owl:Class ;
+    rdfs:label "GuardrailRule"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A machine-executable or policy-level guardrail."@en ;
+    kg:optionalField "asset_type",
+        "description",
+        "market",
+        "mlr_required",
+        "service_line",
+        "technical_mechanism" ;
+    kg:requiredField "decision",
+        "rule_name",
+        "rule_type",
+        "severity" .
+
+kg:Product a owl:Class ;
+    rdfs:label "Product"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "The medicinal product behind a brand."@en ;
+    kg:optionalField "description",
+        "dosage_forms" ;
+    kg:requiredField "active_ingredient",
+        "brand",
+        "name" .
+
+kg:RenalOutcome a owl:Class ;
+    rdfs:label "RenalOutcome"@en ;
+    rdfs:subClassOf kg:ClinicalOutcome ;
+    skos:definition "A kidney outcome reported for Jardiance (e.g. sustained eGFR decline, end-stage kidney disease), measured in a clinical trial."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/jardiance> ;
+    kg:optionalField "hazard_ratio",
+        "p_value",
+        "relative_risk_reduction",
+        "source_page",
+        "trial_name" ;
+    kg:requiredField "outcome_text",
+        "source_document_id" .
+
+kg:SafetyStatement a owl:Class ;
+    rdfs:label "SafetyStatement"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "An important safety statement."@en ;
+    skos:scopeNote "[jardiance] Jardiance Important Safety Information — boxed/special-population warnings (e.g. ketoacidosis, volume depletion, genital mycotic infections)."@en,
+        "[ofev] OFEV (nintedanib) Important Safety Information — including gastrointestinal (diarrhoea), hepatic and other special-population warnings."@en ;
+    kg:allowedSourceDocumentType "medication_guide",
+        "prescribing_information",
+        "product_information" ;
+    kg:optionalField "market",
+        "safety_type" ;
+    kg:requiredField "source_document_id",
+        "statement_text" ;
+    kg:validationRule "[jardiance] EU and Mexico: phrase safety statements in the past tense."@en,
+        "[jardiance] Required Safety Information must accompany any efficacy claim it qualifies."@en,
+        "[ofev] Required Safety Information must accompany any efficacy claim it qualifies."@en,
+        "[ofev] Tolerability messaging must stay within the label (e.g. mild-to-moderate diarrhoea is the most frequent adverse event; <5% discontinued in INPULSIS)."@en .
+
+kg:Table a owl:Class ;
+    rdfs:label "Table"@en ;
+    rdfs:subClassOf kg:ProvenanceEntity ;
+    skos:definition "An extracted table (e.g. one per Excel sheet or PDF table), with its rows preserved in `data`."@en ;
+    kg:optionalField "data",
+        "extraction_method",
+        "page_number",
+        "sheet_name",
+        "table_index" ;
+    kg:requiredField "source_document_id",
+        "table_id" .
+
+kg:VisualRule a owl:Class ;
+    rdfs:label "VisualRule"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "The Boehringer Ingelheim scene-illustration visual system — canvas, stroke, layering, simplified shapes, the brand-adherent colour palette, the five-variant colour logic, file naming, and output/production rules."@en ;
+    skos:scopeNote "[jardiance] Jardiance visual system — the three-layer (yellow/teal/grey) identity and patient-imagery rules."@en,
+        "[ofev] OFEV visual system — the Guardian Blue identity with the golden-gradient secondary graphic and protected logo."@en ;
+    kg:allowedSourceDocumentType "brand_book",
+        "guidance_document" ;
+    kg:optionalField "asset_type",
+        "color_mode",
+        "market",
+        "scene_type",
+        "source_page" ;
+    kg:requiredField "rule_text",
+        "source_document_id" ;
+    kg:validationRule "[boehringer-ingelheim] An illustration is production-ready only after AI + manual vector refinement (human retouch)."@en,
+        "[boehringer-ingelheim] Canvas: every scene illustration is built on a 1920x1080 scene canvas."@en,
+        "[boehringer-ingelheim] Colour variants: each illustration ships with 5 predefined colour variants as switchable layers (blue, gray, red, violet, yellow)."@en,
+        "[boehringer-ingelheim] Colour: use brand-adherent colours only; per-illustration hex palettes are defined in the toolkit (e.g. Medium Yellow #FFD03D, Dark Red #86251B, Warm Gray #E5E3DE, Red #D6804F)."@en,
+        "[boehringer-ingelheim] Depth: use minimal / no-fill background support; backgrounds are controlled, flat scene panels."@en,
+        "[boehringer-ingelheim] File naming: name exported illustrations as Boehringer_Scene_Description_Color-mode."@en,
+        "[boehringer-ingelheim] Human hair colours must be drawn from the BI style-guide human-hair palette (Blonde, Red, White, Warm Gray, Brown, Dark Green, Black); vary hair and skin tones (shadows 03-06) to reflect diversity."@en,
+        "[boehringer-ingelheim] Layering: the stroke layer sits on top and fills are separated from outlines; the illustration is split into Background + Shapes layers."@en,
+        "[boehringer-ingelheim] Mandatory detail elements (hair strokes, clothing shadows, accessories, lip colour, nail definition) must be applied consistently across all illustrations."@en,
+        "[boehringer-ingelheim] Mouth with beard: do not illustrate lips more than a single line when the subject has facial hair, to avoid too many elements."@en,
+        "[boehringer-ingelheim] Output: source files are AI/SVG-ready and editable; visuals are produced in pixel (RGB) first and refined into production-ready vector files (.svg, .ai, .eps)."@en,
+        "[boehringer-ingelheim] Shapes: use simplified visual construction with minimal fill complexity."@en,
+        "[boehringer-ingelheim] Stroke: use a uniform, selective ~2 pt stroke consistently across all outlines and details."@en,
+        "[jardiance] Do not use black-and-white images, direct-to-camera gaze, or patients who look overly joyful, sad or sickly."@en,
+        "[jardiance] Never remove the 3-layer branding, the hero patient visual, graffiti, wall or ground when editing approved assets."@en,
+        "[jardiance] Patient imagery: adults 40-65, overweight but not visibly obese (US BMI not > 30), active/engaged, natural not posed."@en,
+        "[jardiance] The three layers (yellow, teal, grey) must always appear at full saturation."@en,
+        "[jardiance] Use neutral/muted colours and clean, open backgrounds."@en,
+        "[ofev] Guardian Blue (PMS 288) is the core colour and must be the most prominent on the page."@en,
+        "[ofev] Never alter, recolour, rotate, skew, outline, add shadows to, or otherwise modify the OFEV logo; maintain its clear space and minimum size."@en,
+        "[ofev] Patient imagery shows people with IPF in credible, everyday activities; market-specific adaptations exist where photography or brand colours are restricted."@en,
+        "[ofev] The golden-gradient shape is an accent only and must not exceed 15% of the page."@en,
+        "[ofev] The line pattern may appear only within the Guardian Blue shape."@en,
+        "[ofev] The secondary graphic's two shapes (Guardian Blue + golden gradient) must always appear together; never use one without the other."@en .
+
+kg:AssetType a owl:Class ;
+    rdfs:label "AssetType"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A type of creative asset (e.g. email, banner, IVA)."@en ;
+    kg:optionalField "description" ;
+    kg:requiredField "name" .
+
+kg:ClinicalTrial a owl:Class ;
+    rdfs:label "ClinicalTrial"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A pivotal Jardiance trial (e.g. EMPA-REG OUTCOME, EMPEROR-Reduced, EMPEROR-Preserved, EMPA-KIDNEY) that substantiates outcome claims."@en ;
+    skos:scopeNote "[ofev] A pivotal OFEV/nintedanib trial (INPULSIS-1, INPULSIS-2, TOMORROW, with the INPULSIS-ON and INPULSIS-CT extensions) that substantiates outcome claims."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/jardiance>,
+        <urn:kg:vocab:overlay/ofev> ;
+    kg:optionalField "design",
+        "population",
+        "primary_outcome",
+        "source_page" ;
+    kg:requiredField "source_document_id",
+        "trial_name" .
+
+kg:OntologyOverlay a owl:Class .
+
+kg:SceneIllustration a owl:Class ;
+    rdfs:label "SceneIllustration"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A Boehringer Ingelheim AI-generated scene illustration produced under the toolkit (e.g. Chicken, Dog, Pig, German Man, Japanese Man, Saudi Woman, Turkish Man), toolkit-aligned and editable."@en ;
+    kg:declaredInOverlay <urn:kg:vocab:overlay/boehringer-ingelheim> ;
+    kg:optionalField "canvas",
+        "color_mode",
+        "scene_description",
+        "source_page",
+        "stroke",
+        "subject_type" ;
+    kg:requiredField "name",
+        "source_document_id" .
+
+kg:Section a owl:Class ;
+    rdfs:label "Section"@en ;
+    rdfs:subClassOf kg:ProvenanceEntity ;
+    skos:definition "A segmented section of a document (heading-based for PDF, one per sheet for Excel), including its full extracted body text."@en ;
+    kg:optionalField "extraction_method",
+        "page_number",
+        "section_title",
+        "section_type",
+        "text" ;
+    kg:requiredField "section_id",
+        "source_document_id" .
+
+kg:ServiceLine a owl:Class ;
+    rdfs:label "ServiceLine"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "An enterprise service line producing branded content (e.g. Creative, Digital, Video, Research). Shared across all knowledge graphs."@en ;
+    kg:optionalField "description" ;
+    kg:requiredField "name" .
+
+kg:Market a owl:Class ;
+    rdfs:label "Market"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "A market or geography (e.g. US, EU, Global)."@en ;
+    kg:optionalField "code",
+        "region" ;
+    kg:requiredField "name" .
+
+kg:ClinicalOutcome a owl:Class ;
+    rdfs:label "Clinical outcome"@en ;
+    rdfs:comment "Added during reconstruction: common parent of brand-specific outcome classes."@en ;
+    rdfs:subClassOf kg:DomainEntity .
+
+kg:Document a owl:Class ;
+    rdfs:label "Document"@en ;
+    rdfs:subClassOf prov:Entity,
+        kg:ProvenanceEntity ;
+    skos:definition "A single ingested source document (PDF or Excel) and its processing status."@en ;
+    kg:optionalField "brand_id",
+        "file_name",
+        "source_document_type",
+        "status" ;
+    kg:requiredField "source_document_id",
+        "source_file_name" .
+
+kg:ProvenanceEntity a owl:Class ;
+    rdfs:label "Provenance entity"@en ;
+    rdfs:comment "Structural entity describing where knowledge came from (documentProvenanceOntology)."@en ;
+    rdfs:subClassOf prov:Entity .
+
+<urn:kg:vocab:overlay/ofev> a owl:NamedIndividual,
+        kg:OntologyOverlay ;
+    rdfs:label "OFEV (ofev)" ;
+    kg:ontologyModule "Audience [base]",
+        "Brand [base]",
+        "Channel [base]",
+        "Claims [base]",
+        "Compliance [base]",
+        "Governance [base]",
+        "Medical [base]",
+        "OFEV Extension [knowledgeGraphExtension]" .
+
+kg:Brand a owl:Class ;
+    rdfs:label "Brand"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "Boehringer Ingelheim — the corporate brand (not a single product). Governs corporate identity, the design style guide, and AI-generated creative under the \"Life forward\" corporate platform."@en ;
+    skos:scopeNote "[jardiance] A pharmaceutical brand."@en,
+        "[ofev] OFEV (nintedanib) — Boehringer Ingelheim; therapeutic area idiopathic pulmonary fibrosis. Dual-branded as VARGATEF in IPF + lung-cancer markets."@en ;
+    kg:optionalField "description",
+        "market_scope",
+        "status",
+        "therapeutic_area" ;
+    kg:requiredField "name" ;
+    kg:validationRule "[boehringer-ingelheim] All AI-generated creative must align with the BI design style guide and the brand-hub approved assets."@en,
+        "[boehringer-ingelheim] Boehringer Ingelheim is a corporate brand; creative spans the company identity rather than one medicinal product."@en,
+        "[ofev] All promotional materials require local medical/legal/regulatory review for consistency with the local SmPC and Patient Information Leaflet."@en,
+        "[ofev] Use OFEV for IPF-only markets; use VARGATEF where nintedanib launches for both IPF and lung cancer."@en .
+
+<urn:kg:vocab:overlay/boehringer-ingelheim> a owl:NamedIndividual,
+        kg:OntologyOverlay ;
+    rdfs:label "Life Forward (boehringer-ingelheim)" ;
+    kg:ontologyModule "Audience [base]",
+        "Brand [base]",
+        "Channel [base]",
+        "Claims [base]",
+        "Compliance [base]",
+        "Governance [base]",
+        "Life Forward Extension [knowledgeGraphExtension]",
+        "Medical [base]" .
+
+kg:ComplianceRule a owl:Class ;
+    rdfs:label "ComplianceRule"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "Responsible-AI and brand-governance constraints for generating BI scene illustrations — training-data provenance, human-in-the-loop oversight, likeness/privacy protection, and inclusive, culturally appropriate output."@en ;
+    skos:scopeNote "[jardiance] A regulatory or governance constraint."@en,
+        "[ofev] A regulatory or governance constraint."@en ;
+    kg:optionalField "asset_type",
+        "category",
+        "mlr_required",
+        "regulatory_framework",
+        "scope",
+        "service_line",
+        "source_page" ;
+    kg:requiredField "market",
+        "rule_text",
+        "severity",
+        "source_document_id" ;
+    kg:validationRule "[boehringer-ingelheim] Accuracy gate: models progress only when output accuracy passes the threshold (>90% to deploy; HITL QA targets 95-100%)."@en,
+        "[boehringer-ingelheim] Diversity: outputs must span diversity parameters — age, gender, body types, accessories, and environments."@en,
+        "[boehringer-ingelheim] Human-in-the-loop: HITL post-processing and HITL validation are mandatory; an AI-vs-human effort framework governs each illustration before client hand-off."@en,
+        "[boehringer-ingelheim] Reference inputs (photographs) are NOT used for generation; they define only non-identifying appearance direction and styling cues, never a real person's likeness."@en,
+        "[boehringer-ingelheim] Representation must be culturally appropriate and unbiased — covering physical representation, dress/appearance norms, and social/cultural context, and must avoid reinforcing stereotypes."@en,
+        "[boehringer-ingelheim] Training data: the illustration model is trained only on brand-approved assets from the Brand Hub; any new training assets must be brand-approved before use."@en .
+
+<urn:kg:vocab:overlay/jardiance> a owl:NamedIndividual,
+        kg:OntologyOverlay ;
+    rdfs:label "Jardiance (jardiance)" ;
+    kg:ontologyModule "Audience [base]",
+        "Brand [base]",
+        "Channel [base]",
+        "Claims [base]",
+        "Compliance [base]",
+        "Governance [base]",
+        "Jardiance Extension [knowledgeGraphExtension]",
+        "Medical [base]" .
+
+kg:Claim a owl:Class ;
+    rdfs:label "Claim"@en ;
+    rdfs:subClassOf kg:DomainEntity ;
+    skos:definition "An approved or candidate marketing/medical claim."@en ;
+    skos:scopeNote "[jardiance] A Jardiance medical/marketing claim. Indication-scoped and reference-backed; cardiorenal-metabolic efficacy claims trace to a pivotal trial. Approved claims are usable; candidate claims (e.g. corrected claims extracted from iVAs, pending local medical/legal/regulatory validation) are held for review and never served as approved."@en,
+        "[ofev] An OFEV (nintedanib) medical/marketing claim for IPF. Approved-only, indication-scoped, and reference-backed; efficacy claims (FVC decline, acute exacerbations) trace to a pivotal trial."@en ;
+    kg:allowedSourceDocumentType "claims_content_modules",
+        "prescribing_information",
+        "product_information",
+        "promotional_material" ;
+    kg:optionalField "audience",
+        "channel",
+        "claim_status",
+        "indication",
+        "market",
+        "product",
+        "source_status",
+        "trial_name" ;
+    kg:requiredField "claim_text",
+        "indication",
+        "source_document_id" ;
+    kg:validationRule "[jardiance] Claims are market-scoped; do not reuse a claim outside its approved market without local review."@en,
+        "[jardiance] EU: cardiovascular efficacy claims must use the past tense (e.g. 'demonstrated', not 'demonstrates')."@en,
+        "[jardiance] Every claim must cite at least one supporting reference (CLAIM_SUPPORTED_BY_REFERENCE)."@en,
+        "[jardiance] Every efficacy claim must carry the required Safety Information (CLAIM_REQUIRES_SAFETY)."@en,
+        "[jardiance] Only approved claims (claim_status = approved) may be used in output; candidate claims are for review only."@en,
+        "[ofev] Claims are market-scoped and must pass local MLR review against the local SmPC / Patient Information Leaflet before use."@en,
+        "[ofev] Efficacy claims (e.g. ~50% reduction in FVC decline; ~68% reduction in adjudicated acute IPF exacerbations) must be substantiated by INPULSIS-1, INPULSIS-2 or TOMORROW."@en,
+        "[ofev] Every claim must cite at least one supporting reference (CLAIM_SUPPORTED_BY_REFERENCE)."@en,
+        "[ofev] Every efficacy claim must carry the required Safety Information (CLAIM_REQUIRES_SAFETY)."@en,
+        "[ofev] In VARGATEF markets (nintedanib launched for IPF and lung cancer) the brand name is VARGATEF, not OFEV."@en,
+        "[ofev] Only approved claims may enter the OFEV KG (claim_status = approved)."@en .
+
+kg:DomainEntity a owl:Class ;
+    rdfs:label "Domain entity"@en ;
+    rdfs:comment "Business/medical concept (domainOntology). Added during reconstruction: the export's DERIVED_FROM_* relations name 'DomainEntity' as source without declaring it."@en ;
+    owl:disjointWith kg:ProvenanceEntity .
+

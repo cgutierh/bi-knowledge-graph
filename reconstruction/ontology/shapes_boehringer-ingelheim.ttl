@@ -1,0 +1,247 @@
+@prefix kg: <urn:kg:vocab:> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/AssetType> a sh:NodeShape ;
+    sh:property [ sh:message "AssetType: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:AssetType .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Audience> a sh:NodeShape ;
+    sh:property [ sh:message "Audience: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:Audience .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Brand> a sh:NodeShape ;
+    sh:property [ sh:message "Brand: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:Brand .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Channel> a sh:NodeShape ;
+    sh:property [ sh:message "Channel: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:Channel .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Chunk> a sh:NodeShape ;
+    sh:property [ sh:message "Chunk: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "Chunk: required field 'chunk_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:chunk_id ] ;
+    sh:targetClass kg:Chunk .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Claim> a sh:NodeShape ;
+    sh:property [ sh:message "Claim: required field 'claim_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:claim_text ],
+        [ sh:message "Claim: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:in ( "approved" "candidate" "draft" "rejected" ) ;
+            sh:path kg:claim_status ],
+        [ sh:message "Claim: required relationship CLAIM_SUPPORTED_BY_REFERENCE is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:CLAIM_SUPPORTED_BY_REFERENCE ] ;
+    sh:targetClass kg:Claim .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/ColorVariant> a sh:NodeShape ;
+    sh:property [ sh:message "ColorVariant: required field 'color_mode' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:color_mode ] ;
+    sh:targetClass kg:ColorVariant .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/ComplianceRule> a sh:NodeShape ;
+    sh:property [ sh:in ( "critical" "high" "low" "medium" ) ;
+            sh:message "ComplianceRule: required field 'severity' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:severity ],
+        [ sh:message "ComplianceRule: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "ComplianceRule: required field 'rule_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:rule_text ],
+        [ sh:message "ComplianceRule: required field 'market' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:market ] ;
+    sh:targetClass kg:ComplianceRule .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/ContentModule> a sh:NodeShape ;
+    sh:property [ sh:in ( "approved" "draft" "pending" "rejected" ) ;
+            sh:path kg:approval_status ],
+        [ sh:message "ContentModule: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "ContentModule: required field 'module_name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:module_name ] ;
+    sh:targetClass kg:ContentModule .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Document> a sh:NodeShape ;
+    sh:property [ sh:message "Document: required field 'source_file_name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_file_name ],
+        [ sh:message "Document: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ] ;
+    sh:targetClass kg:Document .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/GuardrailRule> a sh:NodeShape ;
+    sh:property [ sh:message "GuardrailRule: required field 'rule_name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:rule_name ],
+        [ sh:in ( "critical" "high" "low" "medium" ) ;
+            sh:message "GuardrailRule: required field 'severity' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:severity ],
+        [ sh:in ( "allow" "block" "escalate" "warn" ) ;
+            sh:message "GuardrailRule: required field 'decision' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:decision ],
+        [ sh:in ( "ai_disclosure" "brand_translation_governance" "consent" "mlr_signoff" "quality_evaluation" "terminology_management" "version_control" ) ;
+            sh:message "GuardrailRule: required field 'rule_type' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:rule_type ] ;
+    sh:targetClass kg:GuardrailRule .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Indication> a sh:NodeShape ;
+    sh:property [ sh:message "Indication: required field 'indication_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:indication_text ],
+        [ sh:message "Indication: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "Indication: required field 'market' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:market ] ;
+    sh:targetClass kg:Indication .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Market> a sh:NodeShape ;
+    sh:property [ sh:message "Market: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:Market .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/PISection> a sh:NodeShape ;
+    sh:property [ sh:message "PISection: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ] ;
+    sh:targetClass kg:PISection .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Persona> a sh:NodeShape ;
+    sh:property [ sh:message "Persona: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:Persona .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Product> a sh:NodeShape ;
+    sh:property [ sh:message "Product: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ],
+        [ sh:message "Product: required field 'brand' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:brand ],
+        [ sh:message "Product: required field 'active_ingredient' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:active_ingredient ] ;
+    sh:targetClass kg:Product .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/QualityCriterion> a sh:NodeShape ;
+    sh:property [ sh:message "QualityCriterion: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:QualityCriterion .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Reference> a sh:NodeShape ;
+    sh:property [ sh:message "Reference: required field 'reference_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:reference_text ],
+        [ sh:message "Reference: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ] ;
+    sh:targetClass kg:Reference .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/ReferenceInput> a sh:NodeShape ;
+    sh:property [ sh:message "ReferenceInput: required field 'appearance_notes' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:appearance_notes ] ;
+    sh:targetClass kg:ReferenceInput .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/RegulatoryFramework> a sh:NodeShape ;
+    sh:property [ sh:message "RegulatoryFramework: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ],
+        [ sh:message "RegulatoryFramework: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "RegulatoryFramework: required field 'scope' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:scope ] ;
+    sh:targetClass kg:RegulatoryFramework .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/SafetyStatement> a sh:NodeShape ;
+    sh:property [ sh:message "SafetyStatement: required field 'statement_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:statement_text ],
+        [ sh:message "SafetyStatement: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ] ;
+    sh:targetClass kg:SafetyStatement .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/SceneIllustration> a sh:NodeShape ;
+    sh:property [ sh:message "SceneIllustration: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "SceneIllustration: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:SceneIllustration .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Section> a sh:NodeShape ;
+    sh:property [ sh:message "Section: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "Section: required field 'section_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:section_id ] ;
+    sh:targetClass kg:Section .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/ServiceLine> a sh:NodeShape ;
+    sh:property [ sh:message "ServiceLine: required field 'name' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:name ] ;
+    sh:targetClass kg:ServiceLine .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/Table> a sh:NodeShape ;
+    sh:property [ sh:message "Table: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "Table: required field 'table_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:table_id ] ;
+    sh:targetClass kg:Table .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/ToneRule> a sh:NodeShape ;
+    sh:property [ sh:message "ToneRule: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "ToneRule: required field 'rule_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:rule_text ] ;
+    sh:targetClass kg:ToneRule .
+
+<urn:kg:vocab:shape/boehringer-ingelheim/VisualRule> a sh:NodeShape ;
+    sh:property [ sh:message "VisualRule: required field 'source_document_id' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:source_document_id ],
+        [ sh:message "VisualRule: required field 'rule_text' is missing" ;
+            sh:minCount 1 ;
+            sh:path kg:rule_text ] ;
+    sh:targetClass kg:VisualRule .
+
