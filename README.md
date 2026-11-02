@@ -8,6 +8,7 @@ Reconstrucción semántica e interfaz web del grafo de conocimiento de Boehringe
 
 | Página | Qué es |
 |---|---|
+| `grafo.html` | **Grafo visual**: mapa de entidades (clases de la ontología con su número de instancias) y las 4.912 instancias como nodos navegables, con búsqueda, filtros por marca y tipo, y ficha de cada nodo |
 | `index.html` | Explorador: búsqueda (texto, `"frase exacta"`, `campo:valor`), fichas de nodo con procedencia y vecindario, consultas SPARQL en el navegador (Oxigraph WASM) y esquema |
 | `auditoria.html` | Diagnóstico del export: hallazgos de calidad, mapa ontología–datos y grafo de negocio |
 | `readme.html` | Documentación completa |
@@ -18,7 +19,7 @@ Para usarla en local hay que servirla por HTTP: `python3 -m http.server 8000` y 
 
 ```
 index.html, auditoria.html, readme.html   páginas web
-data/        kg.json (explorador), kg.trig (dataset RDF), ontology.ttl
+data/        kg.json (explorador), layout.json (posiciones del grafo visual), kg.trig (dataset RDF), ontology.ttl
 vendor/      oxigraph_bg.wasm (motor SPARQL Oxigraph 0.5.11, MIT/Apache-2.0)
 reconstruction/
   ontology/    bi_kg_ontology.ttl (OWL) · shapes_<marca>.ttl (SHACL)

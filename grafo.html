@@ -1,0 +1,386 @@
+<title>BI Knowledge Graph Visual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: full-height workbench — top bar (mode, search, brand), legend rail left, graph canvas centre, record panel right */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --sunk:#e9edf1; --ink:#14202b; --muted:#5b6b78; --line:#d6dde3; --accent:#0d6f8a; --crit:#c92a2a; --warn:#b8681d;
+  --edge:#b9c3cc;
+  --t-Brand:#14202b; --t-Document:#0d6f8a; --t-Section:#8a97a3; --t-PISection:#6f8fa3; --t-Chunk:#b4bec7; --t-Table:#5f7484;
+  --t-Claim:#d9480f; --t-Reference:#e8a33d; --t-ContentModule:#a63e00;
+  --t-ClinicalTrial:#9c36b5; --t-CardiovascularOutcome:#d6336c; --t-RenalOutcome:#d6336c; --t-RespiratoryOutcome:#d6336c;
+  --t-Indication:#3b5bdb; --t-Market:#e67700; --t-SafetyStatement:#c92a2a; --t-ToneRule:#2b8a3e; --t-VisualRule:#66a80f;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f161c; --surface:#16212a; --sunk:#111a21; --ink:#e3eaf0; --muted:#93a3b0; --line:#2a3946; --accent:#4fb3cf; --crit:#ff6b6b; --warn:#ffb057; --edge:#33434f;
+  --t-Brand:#f1f5f8; --t-Document:#4fb3cf; --t-Section:#7d8b97; --t-PISection:#7fa3b8; --t-Chunk:#4c5a66; --t-Table:#9fb3c2;
+  --t-Claim:#ff8a4c; --t-Reference:#ffc861; --t-ContentModule:#ff6b1a;
+  --t-ClinicalTrial:#d58cf0; --t-CardiovascularOutcome:#ff6fa3; --t-RenalOutcome:#ff6fa3; --t-RespiratoryOutcome:#ff6fa3;
+  --t-Indication:#7c95ff; --t-Market:#ffb057; --t-SafetyStatement:#ff6b6b; --t-ToneRule:#5fcf74; --t-VisualRule:#a9e34b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f161c; --surface:#16212a; --sunk:#111a21; --ink:#e3eaf0; --muted:#93a3b0; --line:#2a3946; --accent:#4fb3cf; --crit:#ff6b6b; --warn:#ffb057; --edge:#33434f;
+  --t-Brand:#f1f5f8; --t-Document:#4fb3cf; --t-Section:#7d8b97; --t-PISection:#7fa3b8; --t-Chunk:#4c5a66; --t-Table:#9fb3c2;
+  --t-Claim:#ff8a4c; --t-Reference:#ffc861; --t-ContentModule:#ff6b1a;
+  --t-ClinicalTrial:#d58cf0; --t-CardiovascularOutcome:#ff6fa3; --t-RenalOutcome:#ff6fa3; --t-RespiratoryOutcome:#ff6fa3;
+  --t-Indication:#7c95ff; --t-Market:#ffb057; --t-SafetyStatement:#ff6b6b; --t-ToneRule:#5fcf74; --t-VisualRule:#a9e34b; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45;display:flex;flex-direction:column}
+.bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;background:var(--surface);border-bottom:1.5px solid var(--ink)}
+.brand{font-family:var(--display);font-stretch:78%;font-weight:800;font-size:21px;white-space:nowrap}
+.seg{display:inline-flex;border:1.5px solid var(--ink)}
+.seg button{font-family:var(--display);font-stretch:85%;font-weight:650;font-size:14.5px;padding:5px 14px;background:var(--surface);color:var(--ink);border:0;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.searchwrap{position:relative;flex:1;min-width:200px;max-width:520px}
+.searchwrap input{width:100%;font:inherit;font-size:14.5px;padding:7px 11px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+.searchwrap input:focus{outline:none;border-color:var(--accent)}
+.sugg{position:absolute;left:0;right:0;top:100%;z-index:20;background:var(--surface);border:1.5px solid var(--ink);border-top:0;list-style:none;margin:0;padding:0;max-height:360px;overflow:auto}
+.sugg button{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;padding:7px 10px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:13.5px;cursor:pointer}
+.sugg button:hover,.sugg button.on{background:var(--sunk)}
+.sugg .t{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
+select{font-family:var(--mono);font-size:12.5px;padding:6px 8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.navlinks{display:flex;gap:14px;margin-left:auto}
+.navlinks a{font-family:var(--mono);font-size:12px;color:var(--muted)}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.work{flex:1;min-height:0;display:grid;grid-template-columns:230px minmax(0,1fr) 380px}
+.rail{border-right:1px solid var(--line);background:var(--surface);overflow:auto;padding:12px 12px 20px;padding-left:max(12px,env(safe-area-inset-left,0px))}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.legend{list-style:none;margin:8px 0 14px;padding:0;display:grid;gap:1px}
+.legend label{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:7px;align-items:center;padding:4px 4px;cursor:pointer;font-size:13px}
+.legend label:hover{background:var(--sunk)}
+.legend input{margin:0;accent-color:var(--ink)}
+.legend .n{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.railbtns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.mini{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:3px 8px;cursor:pointer}
+.mini:hover{border-color:var(--ink)}
+.mini[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stage{position:relative;min-width:0;min-height:0;background:var(--bg)}
+#sig{position:absolute;inset:0}
+.hud{position:absolute;left:12px;bottom:12px;display:flex;gap:6px;z-index:5}
+.hud .mini{background:var(--surface)}
+.hud .mini[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stagehint{position:absolute;right:12px;bottom:12px;font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface);padding:3px 7px;border:1px solid var(--line);z-index:5;max-width:60%}
+.loading{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);color:var(--muted)}
+.panel{border-left:1px solid var(--line);background:var(--surface);overflow:auto;padding:16px 18px 24px;padding-right:max(18px,env(safe-area-inset-right,0px))}
+.panel .empty{color:var(--muted)}
+.ptitle{font-family:var(--display);font-stretch:85%;font-weight:700;font-size:21px;line-height:1.2;margin:4px 0 6px;overflow-wrap:anywhere;text-wrap:balance}
+.idline{font-family:var(--mono);font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.sec{margin-top:16px}
+.sec>.eyebrow{display:block;padding-bottom:4px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+.longtext{white-space:pre-wrap;font-size:13.5px;background:var(--sunk);padding:10px 12px;max-height:220px;overflow:auto;overflow-wrap:anywhere}
+dl{display:grid;grid-template-columns:minmax(100px,auto) minmax(0,1fr);gap:4px 12px;margin:0;font-size:13px}
+dt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+dd{margin:0;overflow-wrap:anywhere}
+.flag{border:1px solid var(--crit);color:var(--crit);padding:7px 10px;margin-top:10px;font-size:13px}
+.flag.warn{border-color:var(--warn);color:var(--warn)}
+.rg h4{margin:10px 0 3px;font-family:var(--mono);font-weight:500;font-size:11.5px}
+.rg h4 span{color:var(--muted)}
+.rl{list-style:none;margin:0;padding:0}
+.rl button{display:flex;gap:7px;align-items:baseline;background:none;border:0;padding:2px 0;color:var(--ink);font:inherit;font-size:13px;text-align:left;cursor:pointer}
+.rl button:hover .l{text-decoration:underline}
+.rl .dot{width:8px;height:8px;transform:translateY(-1px)}
+.act{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.act .mini{font-size:12px;padding:5px 10px}
+.act .mini.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+table.cnt{border-collapse:collapse;font-size:13px;width:100%;font-variant-numeric:tabular-nums}
+table.cnt td{padding:4px 6px;border-bottom:1px solid var(--line)}
+table.cnt td:last-child{text-align:right}
+@media (max-width:1100px){.work{grid-template-columns:200px minmax(0,1fr) 320px}}
+@media (max-width:820px){
+  body{height:auto;display:block}
+  .work{display:block}
+  .rail{border-right:0;border-bottom:1px solid var(--line);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .legend{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stage{height:62vh}
+  .panel{border-left:0;border-top:1px solid var(--line);padding-left:max(16px,env(safe-area-inset-left,0px))}
+  .navlinks{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="bar">
+  <div class="brand">BI Knowledge Graph</div>
+  <div class="seg" role="group" aria-label="Vista">
+    <button id="mEnt" aria-pressed="true">Entidades</button>
+    <button id="mInst" aria-pressed="false">Instancias</button>
+  </div>
+  <div class="searchwrap">
+    <input id="q" type="search" placeholder="Buscar un nodo: EMPA-KIDNEY, ketoacidosis, Brand Book…" autocomplete="off" aria-label="Buscar nodo">
+    <ul class="sugg" id="sugg" hidden></ul>
+  </div>
+  <select id="kg" aria-label="Grafo">
+    <option value="">Todas las marcas</option>
+    <option value="boehringer-ingelheim">Life Forward (BI)</option>
+    <option value="jardiance">Jardiance</option>
+    <option value="ofev">OFEV</option>
+  </select>
+  <nav class="navlinks" id="navlinks"></nav>
+</header>
+
+<div class="work">
+  <aside class="rail">
+    <div class="eyebrow" id="legendTitle">Entidades</div>
+    <div class="railbtns" id="railbtns"></div>
+    <ul class="legend" id="legend"></ul>
+    <div class="eyebrow">Cómo se lee</div>
+    <p id="howto" style="font-size:12.5px;color:var(--muted);margin:6px 0 0"></p>
+  </aside>
+  <div class="stage">
+    <div id="sig"></div>
+    <div class="loading" id="loading">Cargando el grafo…</div>
+    <div class="hud">
+      <button class="mini" id="zin" aria-label="Acercar">+</button>
+      <button class="mini" id="zout" aria-label="Alejar">−</button>
+      <button class="mini" id="zreset">Encuadrar</button>
+      <button class="mini" id="egoBtn" aria-pressed="false" hidden>Solo vecinos</button>
+    </div>
+    <div class="stagehint" id="hint"></div>
+  </div>
+  <aside class="panel" id="panel"><p class="empty">Pulsa una entidad o un nodo.</p></aside>
+</div>
+
+<script>window.KG_LINKS=[["index.html","Explorador y SPARQL"],["auditoria.html","Auditoría"],["readme.html","README"]];</script>
+<script src="https://cdn.jsdelivr.net/npm/graphology@0.25.4/dist/graphology.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sigma@2.4.0/build/sigma.min.js"></script>
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=n=>Number(n).toLocaleString("es-ES");
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const KGN={"boehringer-ingelheim":"Life Forward (BI)","jardiance":"Jardiance","ofev":"OFEV","enterprise":"Enterprise"};
+const LONG=["claim_text","reference_text","statement_text","indication_text","outcome_text","rule_text","text"];
+const SIZE={Brand:16,Document:10,ClinicalTrial:7,CardiovascularOutcome:6,RenalOutcome:6,RespiratoryOutcome:6,Indication:6,Market:7,ContentModule:6,Table:6,Claim:3.2,Reference:2.6,SafetyStatement:3,ToneRule:3,VisualRule:3,PISection:2.4,Section:2.4,Chunk:1.7};
+const tcol=t=>css("--t-"+t)||css("--muted");
+const SigmaCls=(window.Sigma&&(Sigma.default||Sigma));
+const links=(window.KG_LINKS||[]);
+$("#navlinks").innerHTML=links.map(([h,l])=>`<a href="${h}">${l}</a>`).join("");
+
+let K,N,OUT,IN,L,G,R,mode="ent",sel=null,hover=null,kgF="",hiddenTypes=new Set(),ego=false,typeHi=null;
+
+Promise.all([fetch("data/kg.json").then(r=>r.json()),fetch("data/layout.json").then(r=>r.json())]).then(([k,l])=>{K=k;L=l;init()}).catch(e=>{$("#loading").textContent="No se pudieron cargar los datos ("+e.message+")."});
+
+function init(){
+  if(!SigmaCls||!window.graphology){$("#loading").textContent="No se pudo cargar la librería del grafo (sigma.js).";return}
+  N=K.nodes.map((n,i)=>({i,id:n[0],type:K.types[n[1]],kg:n[2],label:n[3],p:n[4],hay:(n[3]+" "+n[0]+" "+LONG.map(f=>n[4][f]||"").join(" ")+" "+(n[4].nct_number||"")+" "+(n[4].source_file_name||"")).toLowerCase()}));
+  OUT=N.map(()=>[]);IN=N.map(()=>[]);
+  K.edges.forEach(([s,t,o])=>{OUT[s].push([K.rtypes[t],o]);IN[o].push([K.rtypes[t],s])});
+  $("#loading").hidden=true;
+  setMode("ent");
+}
+
+/* ---------------- shared renderer ---------------- */
+function drawHover(ctx,data,settings){
+  const size=settings.labelSize,font=settings.labelFont,weight=settings.labelWeight;
+  ctx.font=`${weight} ${size}px ${font}`;
+  const label=data.label||"";const w=Math.min(ctx.measureText(label).width,420)+10,h=size+8;
+  ctx.fillStyle=css("--surface");ctx.strokeStyle=css("--ink");ctx.lineWidth=1;
+  const x=data.x+data.size+4,y=data.y-h/2;
+  ctx.beginPath();ctx.rect(x,y,w,h);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.arc(data.x,data.y,data.size+2,0,Math.PI*2);ctx.strokeStyle=css("--ink");ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle=css("--ink");ctx.fillText(label.length>70?label.slice(0,68)+"…":label,x+5,data.y+size/3);
+}
+function drawLabel(ctx,data,settings){
+  if(!data.label)return;const size=settings.labelSize;ctx.font=`${settings.labelWeight} ${size}px ${settings.labelFont}`;
+  const t=data.label.length>40?data.label.slice(0,38)+"…":data.label;
+  ctx.lineWidth=3;ctx.strokeStyle=css("--bg");ctx.strokeText(t,data.x+data.size+3,data.y+size/3);
+  ctx.fillStyle=css("--ink");ctx.fillText(t,data.x+data.size+3,data.y+size/3);
+}
+function makeRenderer(graph,extra){
+  if(R){R.kill();R=null}
+  $("#sig").innerHTML="";
+  R=new SigmaCls(graph,$("#sig"),Object.assign({
+    labelFont:'"IBM Plex Mono", ui-monospace, monospace',labelSize:11,labelWeight:"500",
+    labelColor:{color:css("--ink")},defaultEdgeColor:css("--edge"),
+    hoverRenderer:drawHover,labelRenderer:drawLabel,
+    zIndex:true,allowInvalidContainer:true,
+    nodeReducer:(n,a)=>nodeReduce(n,a),edgeReducer:(e,a)=>edgeReduce(e,a),
+  },extra));
+  R.on("enterNode",({node})=>{hover=node;$("#sig").style.cursor="pointer";R.refresh()});
+  R.on("leaveNode",()=>{hover=null;$("#sig").style.cursor="";R.refresh()});
+  R.on("clickNode",({node})=>{mode==="ent"?selectEntity(node):selectInstance(+node,true)});
+  R.on("clickStage",()=>{sel=null;ego=false;$("#egoBtn").setAttribute("aria-pressed","false");panelEmpty();R.refresh()});
+  return R;
+}
+$("#zin").onclick=()=>R&&R.getCamera().animatedZoom({duration:250});
+$("#zout").onclick=()=>R&&R.getCamera().animatedUnzoom({duration:250});
+$("#zreset").onclick=()=>R&&R.getCamera().animatedReset({duration:350});
+$("#egoBtn").onclick=()=>{ego=!ego;$("#egoBtn").setAttribute("aria-pressed",ego);R.refresh()};
+function focusNode(key,ratio){const d=R.getNodeDisplayData(key);if(d)R.getCamera().animate({x:d.x,y:d.y,ratio:ratio??0.3},{duration:450})}
+
+function neighborsOf(key){const s=new Set([key]);G.forEachNeighbor(key,n=>s.add(n));return s}
+let nbCache=null,nbKey=null;
+function activeSet(){const k=sel??hover;if(k==null)return null;if(nbKey!==k){nbKey=k;nbCache=neighborsOf(String(k))}return nbCache}
+function nodeReduce(n,a){
+  const r={...a};
+  if(mode==="inst"){
+    const node=N[+n];
+    if(hiddenTypes.has(node.type)||(kgF&&node.kg!==kgF&&node.kg!=="enterprise")){r.hidden=true;return r}
+    if(typeHi&&node.type!==typeHi&&!activeSet()){r.color=css("--edge");r.label="";r.zIndex=0;return r}
+    if(typeHi&&node.type===typeHi){r.zIndex=2}
+  }
+  const act=activeSet();
+  if(act){
+    if(act.has(n)){r.zIndex=3;r.forceLabel=true;if(String(sel)===n||String(hover)===n){r.highlighted=true;r.size=a.size*1.4}}
+    else if(ego&&mode==="inst"){r.hidden=true}
+    else{r.color=css("--edge");r.label="";r.zIndex=0}
+  }
+  return r;
+}
+function edgeReduce(e,a){
+  const r={...a};
+  const [s,t]=G.extremities(e);
+  if(mode==="inst"){
+    const S=N[+s],T=N[+t];
+    if(hiddenTypes.has(S.type)||hiddenTypes.has(T.type)){r.hidden=true;return r}
+    if(kgF&&((S.kg!==kgF&&S.kg!=="enterprise")||(T.kg!==kgF&&T.kg!=="enterprise"))){r.hidden=true;return r}
+  }
+  const k=sel??hover;
+  if(mode==="ent"&&!(k!=null&&(s===String(k)||t===String(k))))r.label="";
+  if(k!=null){const kk=String(k);if(s===kk||t===kk){r.color=css("--ink");r.size=Math.max(a.size,1.5);r.zIndex=2;if(mode==="ent")r.forceLabel=true}else if(ego&&mode==="inst"){r.hidden=true}else{r.hidden=mode==="inst";r.color=css("--edge")}}
+  return r;
+}
+
+/* ---------------- modes ---------------- */
+$("#mEnt").onclick=()=>setMode("ent");
+$("#mInst").onclick=()=>setMode("inst");
+$("#kg").onchange=e=>{kgF=e.target.value;if(mode==="ent"){buildEntities()}else{R.refresh()}};
+function setMode(m,opts={}){
+  mode=m;sel=null;hover=null;nbKey=null;ego=false;typeHi=opts.typeHi||null;
+  $("#mEnt").setAttribute("aria-pressed",m==="ent");$("#mInst").setAttribute("aria-pressed",m==="inst");
+  $("#egoBtn").hidden=m!=="inst";$("#egoBtn").setAttribute("aria-pressed","false");
+  if(m==="ent"){buildEntities();panelEmpty()}else{buildInstances();if(!opts.keepPanel)panelEmpty()}
+}
+
+function counts(){const c={};N.forEach(n=>{if(!kgF||n.kg===kgF||(n.kg==="enterprise"&&kgF!=="boehringer-ingelheim"))c[n.type]=(c[n.type]||0)+1});return c}
+function buildEntities(){
+  const c=counts();G=new graphology.MultiDirectedGraph();
+  const rc={};K.edges.forEach(([s,t,o])=>{const n=N[s];if(kgF&&n.kg!==kgF)return;const k=K.rtypes[t]+"|"+N[s].type+"|"+N[o].type;rc[k]=(rc[k]||0)+1});
+  const maxc=Math.max(...Object.values(c));
+  Object.keys(K.classes).forEach(name=>{
+    const v=c[name]||0,[x,y]=L.cls[name]||[0,0];
+    G.addNode(name,{x,y,label:`${name} · ${fmt(v)}`,size:v?7+Math.sqrt(v/maxc)*22:5,color:v?tcol(name):css("--edge"),borderColor:css("--muted")});
+  });
+  Object.entries(K.rels).forEach(([r,d])=>d.src.forEach(s=>d.tgt.forEach(t=>{
+    if(!G.hasNode(s)||!G.hasNode(t))return;const v=rc[r+"|"+s+"|"+t]||0;
+    G.addEdge(s,t,{label:`${r}${v?" · "+fmt(v):""}`,size:v?1+Math.log10(v+1)*1.6:0.6,color:v?css("--muted"):css("--edge"),type:"arrow"});
+  })));
+  makeRenderer(G,{renderEdgeLabels:true,edgeLabelSize:10,edgeLabelFont:'"IBM Plex Mono", monospace',edgeLabelColor:{color:css("--muted")},labelRenderedSizeThreshold:0,defaultEdgeType:"arrow"});
+  $("#legendTitle").textContent="Entidades (clases)";
+  $("#railbtns").innerHTML="";
+  const ent=Object.keys(K.classes).sort((a,b)=>(c[b]||0)-(c[a]||0)||a.localeCompare(b));
+  $("#legend").innerHTML=ent.map(t=>`<li><label data-t="${t}" style="grid-template-columns:auto minmax(0,1fr) auto"><i class="dot" style="background:${c[t]?tcol(t):"transparent"};${c[t]?"":"border:1.5px dashed "+css("--muted")}"></i><span>${t}</span><span class="n">${c[t]?fmt(c[t]):"vacía"}</span></label></li>`).join("");
+  $("#legend").querySelectorAll("label").forEach(l=>l.onclick=e=>{e.preventDefault();selectEntity(l.dataset.t)});
+  $("#howto").textContent="Cada círculo es una entidad de la ontología y su tamaño refleja cuántas instancias tiene; las grises están declaradas pero vacías. Las flechas son tipos de relación con su número de aristas. Pulsa una entidad para ver su definición y sus instancias.";
+  $("#hint").textContent=`${Object.keys(K.classes).length} entidades · ${Object.keys(K.rels).length} tipos de relación`;
+}
+
+function buildInstances(){
+  G=new graphology.Graph({multi:true,type:"directed"});
+  N.forEach(n=>{const [x,y]=L.inst[n.i];G.addNode(String(n.i),{x,y:-y,size:SIZE[n.type]||2,color:tcol(n.type),label:n.label,type:"circle"})});
+  K.edges.forEach(([s,t,o],k)=>{G.addEdgeWithKey("e"+k,String(s),String(o),{size:0.5,color:css("--edge"),rel:K.rtypes[t]})});
+  makeRenderer(G,{renderEdgeLabels:false,labelRenderedSizeThreshold:7.5,defaultEdgeType:"line",minCameraRatio:0.02,maxCameraRatio:3});
+  $("#legendTitle").textContent="Tipos de nodo (pulsa para ocultar)";
+  const c=counts();const types=Object.keys(c).sort((a,b)=>(SIZE[b]||0)-(SIZE[a]||0)||c[b]-c[a]);
+  $("#railbtns").innerHTML=`<button class="mini" id="showAll">Mostrar todo</button><button class="mini" id="hideText">Ocultar secciones y chunks</button>`;
+  $("#showAll").onclick=()=>{hiddenTypes.clear();syncLegend();R.refresh()};
+  $("#hideText").onclick=()=>{["Chunk","Section","PISection"].forEach(t=>hiddenTypes.add(t));syncLegend();R.refresh()};
+  $("#legend").innerHTML=types.map(t=>`<li><label><input type="checkbox" data-t="${t}" ${hiddenTypes.has(t)?"":"checked"}><i class="dot" style="background:${tcol(t)}"></i><span>${t}</span><span class="n">${fmt(c[t])}</span></label></li>`).join("");
+  $("#legend").querySelectorAll("input").forEach(i=>i.onchange=()=>{i.checked?hiddenTypes.delete(i.dataset.t):hiddenTypes.add(i.dataset.t);if(typeHi===i.dataset.t&&!i.checked)typeHi=null;R.refresh()});
+  $("#howto").textContent="Cada punto es una instancia, con un color por entidad. Hay tres racimos, uno por marca: Life Forward a la izquierda, Jardiance en el centro y OFEV a la derecha. Pasa el ratón por un nodo para ver sus vecinos y púlsalo para abrir su ficha. Con la rueda o pellizcando haces zoom; los nombres aparecen al acercarte.";
+  $("#hint").textContent=`${fmt(N.length)} instancias · ${fmt(K.edges.length)} relaciones`;
+}
+function syncLegend(){$("#legend").querySelectorAll("input").forEach(i=>i.checked=!hiddenTypes.has(i.dataset.t))}
+
+/* ---------------- panels ---------------- */
+function panelEmpty(){
+  $("#panel").innerHTML=mode==="ent"
+   ?`<div class="eyebrow">Vista de entidades</div><div class="ptitle">Ontología y número de instancias</div><p class="empty">Pulsa una entidad del grafo o de la lista para ver su definición, sus reglas, sus relaciones y cuántas instancias tiene en cada marca.</p>${summaryTable()}`
+   :`<div class="eyebrow">Vista de instancias</div><div class="ptitle">${fmt(N.length)} nodos</div><p class="empty">Pulsa un nodo o búscalo arriba. Al seleccionarlo se resaltan sus vecinos, y con «Solo vecinos» se oculta el resto.</p>${summaryTable()}`;
+}
+function summaryTable(){
+  const ks=["boehringer-ingelheim","jardiance","ofev"];
+  return `<div class="sec"><span class="eyebrow">Por marca</span><table class="cnt">${ks.map(k=>`<tr><td>${KGN[k]}</td><td>${fmt(N.filter(n=>n.kg===k).length)} nodos</td></tr>`).join("")}<tr><td>Enterprise (compartido)</td><td>${fmt(N.filter(n=>n.kg==="enterprise").length)} nodos</td></tr></table></div>`;
+}
+function selectEntity(name){
+  sel=name;nbKey=null;R.refresh();focusNode(name,0.8);
+  const d=K.classes[name],c={};N.forEach(n=>{if(n.type===name)c[n.kg]=(c[n.kg]||0)+1});
+  const tot=Object.values(c).reduce((a,b)=>a+b,0);
+  const defs=[...new Set(Object.values(d.def))];
+  const outR=Object.entries(K.rels).filter(([r,x])=>x.src.includes(name)),inR=Object.entries(K.rels).filter(([r,x])=>x.tgt.includes(name));
+  const rc={};K.edges.forEach(([s,t,o])=>{if(N[s].type===name||N[o].type===name)rc[K.rtypes[t]]=(rc[K.rtypes[t]]||0)+1});
+  const sample=N.filter(n=>n.type===name&&(!kgF||n.kg===kgF)).slice(0,12);
+  $("#panel").innerHTML=`<div class="eyebrow">Entidad · ${d.layer==="prov"?"procedencia":"dominio"}</div>
+   <div class="ptitle"><i class="dot" style="background:${tot?tcol(name):"transparent"};width:12px;height:12px;margin-right:8px"></i>${esc(name)}</div>
+   ${defs.map(x=>`<p style="margin:6px 0;font-size:13.5px">${esc(x)}</p>`).join("")}
+   <div class="act">${tot?`<button class="mini primary" id="seeInst">Ver sus ${fmt(tot)} instancias en el grafo</button>`:`<span class="flag warn" style="margin:0">Declarada en la ontología, pero sin instancias.</span>`}</div>
+   <div class="sec"><span class="eyebrow">Instancias por marca</span><table class="cnt">${Object.keys(KGN).map(k=>`<tr><td>${KGN[k]}</td><td>${fmt(c[k]||0)}</td></tr>`).join("")}</table></div>
+   ${d.req.length?`<div class="sec"><span class="eyebrow">Campos obligatorios</span><p class="idline" style="font-size:12px">${d.req.map(esc).join(" · ")}</p></div>`:""}
+   ${d.rules.length?`<div class="sec"><span class="eyebrow">Reglas de validación</span><ul style="padding-left:18px;margin:0;font-size:13px">${d.rules.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div>`:""}
+   <div class="sec"><span class="eyebrow">Relaciones</span>
+     ${outR.map(([r,x])=>`<div class="rg"><h4>→ ${r} <span>${x.tgt.join(", ")} · ${fmt(rc[r]||0)}</span></h4></div>`).join("")}
+     ${inR.map(([r,x])=>`<div class="rg"><h4>← ${r} <span>${x.src.join(", ")} · ${fmt(rc[r]||0)}</span></h4></div>`).join("")}</div>
+   ${sample.length?`<div class="sec"><span class="eyebrow">Ejemplos de instancias</span><ul class="rl">${sample.map(n=>`<li><button data-i="${n.i}"><i class="dot" style="background:${tcol(n.type)}"></i><span class="l">${esc(n.label)}</span></button></li>`).join("")}</ul></div>`:""}`;
+  const si=$("#seeInst");if(si)si.onclick=()=>{hiddenTypes.delete(name);setMode("inst",{typeHi:name});$("#hint").textContent=`Resaltadas: ${fmt(tot)} instancias de ${name} · pulsa una para ver su ficha`;entityHint(name,tot)};
+  $("#panel").querySelectorAll("button[data-i]").forEach(b=>b.onclick=()=>{hiddenTypes.delete(N[+b.dataset.i].type);setMode("inst",{keepPanel:true});selectInstance(+b.dataset.i,true)});
+}
+function entityHint(name,tot){
+  $("#panel").innerHTML=`<div class="eyebrow">Instancias resaltadas</div><div class="ptitle"><i class="dot" style="background:${tcol(name)};width:12px;height:12px;margin-right:8px"></i>${esc(name)}</div><p class="empty">${fmt(tot)} instancias resaltadas en el grafo. Pulsa una para abrir su ficha.</p><div class="act"><button class="mini" id="clearHi">Quitar resaltado</button><button class="mini" id="backEnt">Volver a la entidad</button></div>
+  <div class="sec"><span class="eyebrow">Lista</span><ul class="rl">${N.filter(n=>n.type===name).slice(0,200).map(n=>`<li><button data-i="${n.i}"><i class="dot" style="background:${tcol(n.type)}"></i><span class="l">${esc(n.label)}</span></button></li>`).join("")}</ul></div>`;
+  $("#clearHi").onclick=()=>{typeHi=null;R.refresh();panelEmpty()};
+  $("#backEnt").onclick=()=>{setMode("ent");selectEntity(name)};
+  $("#panel").querySelectorAll("button[data-i]").forEach(b=>b.onclick=()=>selectInstance(+b.dataset.i,true));
+}
+function selectInstance(i,fly){
+  const n=N[i];
+  if(hiddenTypes.has(n.type)){hiddenTypes.delete(n.type);syncLegend()}
+  if(kgF&&n.kg!==kgF&&n.kg!=="enterprise"){kgF="";$("#kg").value=""}
+  sel=String(i);nbKey=null;R.refresh();if(fly)focusNode(sel);
+  const flags=[];
+  if(n.type==="Claim"&&/efficacy/i.test(n.p.key_message_type||"")&&!OUT[i].some(([t])=>t==="CLAIM_REQUIRES_SAFETY"))flags.push(["","Claim de eficacia sin CLAIM_REQUIRES_SAFETY: incumple la regla de la ontología."]);
+  if(n.type==="Claim"&&n.p.claim_status==="candidate")flags.push(["warn","Claim candidato: solo para revisión."]);
+  if(n.type==="RenalOutcome")flags.push(["","Error de extracción: el texto describe la población del estudio, no un resultado."]);
+  const long=LONG.filter(k=>n.p[k]);const props=Object.entries(n.p).filter(([k])=>!long.includes(k)&&k!=="data"&&k!=="source_hash");
+  const grp=a=>{const g={};a.forEach(([t,o])=>(g[t]=g[t]||[]).push(o));return Object.entries(g)};
+  const rel=(a,dir)=>grp(a).map(([t,os])=>`<div class="rg"><h4>${dir} ${t} <span>(${fmt(os.length)})</span></h4><ul class="rl">${os.slice(0,25).map(o=>`<li><button data-i="${o}"><i class="dot" style="background:${tcol(N[o].type)}"></i><span class="l">${esc(N[o].label)}</span></button></li>`).join("")}${os.length>25?`<li class="idline">… y ${fmt(os.length-25)} más</li>`:""}</ul></div>`).join("");
+  $("#panel").innerHTML=`<div class="eyebrow"><i class="dot" style="background:${tcol(n.type)};margin-right:6px"></i>Instancia de ${n.type} · ${KGN[n.kg]}</div>
+   <div class="ptitle">${esc(n.label)}</div><div class="idline">${esc(n.id)}</div>
+   <div class="act"><button class="mini" id="toEnt">Ver la entidad ${n.type}</button><button class="mini" id="egoP">${ego?"Mostrar todo":"Solo vecinos"}</button></div>
+   ${flags.map(([s,f])=>`<div class="flag ${s}">${esc(f)}</div>`).join("")}
+   ${long.map(k=>`<div class="sec"><span class="eyebrow">${k}</span><div class="longtext">${esc(n.p[k])}</div></div>`).join("")}
+   <div class="sec"><span class="eyebrow">Propiedades</span><dl>${props.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(typeof v==="object"?JSON.stringify(v):v)}</dd>`).join("")}</dl></div>
+   <div class="sec"><span class="eyebrow">Relaciones · ${fmt(OUT[i].length+IN[i].length)}</span>${rel(OUT[i],"→")}${rel(IN[i],"←")}</div>`;
+  $("#panel").querySelectorAll("button[data-i]").forEach(b=>b.onclick=()=>selectInstance(+b.dataset.i,true));
+  $("#toEnt").onclick=()=>{setMode("ent");selectEntity(n.type)};
+  $("#egoP").onclick=()=>{ego=!ego;$("#egoBtn").setAttribute("aria-pressed",ego);$("#egoP").textContent=ego?"Mostrar todo":"Solo vecinos";R.refresh()};
+  $("#panel").scrollTop=0;
+}
+
+/* ---------------- search ---------------- */
+let sugg=[],sIdx=0;
+$("#q").addEventListener("input",()=>{
+  const q=$("#q").value.trim().toLowerCase();
+  if(q.length<2){$("#sugg").hidden=true;return}
+  const ws=q.split(/\s+/);
+  const scored=[];for(const n of N){if(kgF&&n.kg!==kgF&&n.kg!=="enterprise")continue;if(ws.every(w=>n.hay.includes(w))){const lab=n.label.toLowerCase();scored.push([n,(lab.includes(q)?0:1)+(SIZE[n.type]>=6?0:0.5)]);if(scored.length>400)break}}
+  scored.sort((a,b)=>a[1]-b[1]);sugg=scored.slice(0,12).map(x=>x[0]);sIdx=0;
+  $("#sugg").innerHTML=sugg.length?sugg.map((n,k)=>`<li><button data-k="${k}" class="${k===0?"on":""}"><i class="dot" style="background:${tcol(n.type)}"></i><span>${esc(n.label.length>80?n.label.slice(0,78)+"…":n.label)}</span><span class="t">${n.type} · ${KGN[n.kg]}</span></button></li>`).join(""):`<li style="padding:8px 10px;color:var(--muted)">Sin resultados</li>`;
+  $("#sugg").hidden=false;
+  $("#sugg").querySelectorAll("button").forEach(b=>b.onmousedown=e=>{e.preventDefault();pick(sugg[+b.dataset.k])});
+});
+$("#q").addEventListener("keydown",e=>{
+  if($("#sugg").hidden||!sugg.length)return;
+  if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();sIdx=(sIdx+(e.key==="ArrowDown"?1:sugg.length-1))%sugg.length;$("#sugg").querySelectorAll("button").forEach((b,k)=>b.classList.toggle("on",k===sIdx))}
+  if(e.key==="Enter"){e.preventDefault();pick(sugg[sIdx])}
+  if(e.key==="Escape"){$("#sugg").hidden=true}
+});
+$("#q").addEventListener("blur",()=>setTimeout(()=>$("#sugg").hidden=true,150));
+function pick(n){$("#sugg").hidden=true;typeHi=null;$("#hint").textContent=`${fmt(N.length)} instancias · ${fmt(K.edges.length)} relaciones`;$("#q").value=n.label.slice(0,60);if(mode!=="inst")setMode("inst",{keepPanel:true});selectInstance(n.i,true)}
+})();
+</script>
